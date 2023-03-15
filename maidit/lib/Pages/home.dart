@@ -5,7 +5,9 @@ import 'package:maidit/Pages/Profil.dart';
 import 'package:maidit/Pages/Search.dart';
 import 'package:maidit/Pages/Suggestions.dart';
 
+import '../model/Authentication.dart';
 import '../model/MaidModel.dart';
+import '../model/UserFirebaseService.dart';
 import '../model/UserModel.dart';
 import 'Login and SignIn/LogIn.dart';
 import 'Messages.dart';
@@ -77,10 +79,28 @@ class _HomeState extends State<Home> {
     });
   }
 
+  logOutAccount() async {
+    Authentication auth = Authentication();
+    auth.logOut();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LogIn(),
+      ),
+    );
+  }
+
+  getData() async {
+    UserFirebaseService usr = UserFirebaseService();
+    usr.getUser();
+  }
+
   User user = User(
     id: '12345',
     nom: 'Ghita',
     prenom: 'Moslih',
+    genre: 'femme',
+    email: 'Ghita.Moslih@mail.com',
     phone: 555555555,
     ville: 'Rabat',
     adresse: '123 Avenue de France',
@@ -108,6 +128,8 @@ class _HomeState extends State<Home> {
       id: '1',
       nom: 'Smith',
       prenom: 'Anna',
+      genre: 'femme',
+      email: 'Smith.Anna@mail.com',
       phone: 123456789,
       ville: 'Paris',
       adresse: '123 Main Street',
@@ -126,11 +148,14 @@ class _HomeState extends State<Home> {
       prixMax: 20.0,
       rating: 4.5,
       nbrRating: 10,
+      certified: true,
     ),
     Maid(
       id: '2',
       nom: 'Johnson',
       prenom: 'Sarah',
+      genre: 'femme',
+      email: 'Johnson.Sarah@mail.com',
       phone: 987654321,
       ville: 'New York',
       adresse: '456 Maple Ave',
@@ -148,11 +173,14 @@ class _HomeState extends State<Home> {
       prixMax: 25.0,
       rating: 4.8,
       nbrRating: 20,
+      certified: false,
     ),
     Maid(
       id: '3',
       nom: 'Williams',
       prenom: 'Jessica',
+      genre: 'femme',
+      email: 'Williams.Jessica@mail.com',
       phone: 555555555,
       ville: 'Los Angeles',
       adresse: '789 Oak Street',
@@ -160,7 +188,7 @@ class _HomeState extends State<Home> {
       description: 'I am a friendly and efficient maid.',
       photo:
           'https://img.freepik.com/free-photo/beautiful-smiling-girl-introduce-something-holding-hand_1258-19078.jpg?w=1060&t=st=1678834702~exp=1678835302~hmac=277574d9008cd8567b2338e82c7bdc1e5e9b9d2e2897e9ce197457c483921c9b',
-      tags: ['Ménage', 'Netoyage'],
+      tags: ['Ménage', 'Nettoyage'],
       events: [
         DateTime.utc(2023, 3, 14).subtract(const Duration(days: 9)),
       ],
@@ -168,6 +196,7 @@ class _HomeState extends State<Home> {
       prixMax: 30.0,
       rating: 4.3,
       nbrRating: 15,
+      certified: true,
     ),
   ];
 
@@ -285,7 +314,9 @@ class _HomeState extends State<Home> {
               ),
               ListTile(
                 title: const Text('Modifier mes informations personelles'),
-                onTap: () {},
+                onTap: () {
+                  getData(); //TODO: remove this
+                },
               ),
               ListTile(
                 title: const Text('Paramétres'),
@@ -301,12 +332,7 @@ class _HomeState extends State<Home> {
                   style: TextStyle(color: Color.fromARGB(255, 239, 31, 118)),
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LogIn(),
-                    ),
-                  );
+                  logOutAccount();
                 },
               ),
             ],

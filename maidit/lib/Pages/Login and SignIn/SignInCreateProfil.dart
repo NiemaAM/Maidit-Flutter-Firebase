@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../model/UserFirebaseService.dart';
 import 'SignInChooseTags.dart';
 
 class SignInCreateProfil extends StatefulWidget {
@@ -26,6 +27,18 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
         _image = File(pickedFile.path);
       } else {}
     });
+  }
+
+  CreateAccount(String description, File photo, String genre, String ville,
+      String adresse) async {
+    UserFirebaseService usr = UserFirebaseService();
+    usr.updateUser(description, photo, genre, ville, adresse);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SignInChooseTags(),
+      ),
+    );
   }
 
   @override
@@ -192,12 +205,8 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignInChooseTags(),
-                    ),
-                  );
+                  CreateAccount(
+                      _DescriptionController.text, _image!, '', '', '');
                 },
                 child: Row(
                   children: const [

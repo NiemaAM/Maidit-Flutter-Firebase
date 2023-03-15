@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:maidit/Pages/home.dart';
 
+import '../../model/UserFirebaseService.dart';
+
 class SignInChooseTags extends StatefulWidget {
   const SignInChooseTags({super.key});
 
@@ -77,6 +79,17 @@ class _SignInChooseTagsState extends State<SignInChooseTags> {
         ),
       );
     });
+  }
+
+  AddTags() async {
+    UserFirebaseService usr = UserFirebaseService();
+    usr.updateUserAddTags(_chosenTags);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Home(),
+      ),
+    );
   }
 
   @override
@@ -175,12 +188,7 @@ class _SignInChooseTagsState extends State<SignInChooseTags> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Home(),
-                  ),
-                );
+                AddTags();
               },
               child: const Center(child: Text("Términer")),
             ),

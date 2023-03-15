@@ -27,6 +27,7 @@ class _HistoryState extends State<History> {
         appBar: AppBar(
           title: _Searchpressed
               ? TextField(
+                  autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Rechercher un profil',
                     border: InputBorder.none,

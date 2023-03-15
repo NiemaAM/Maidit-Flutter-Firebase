@@ -25,6 +25,7 @@ class _MessagesState extends State<Messages> {
         appBar: AppBar(
           title: _Searchpressed
               ? TextField(
+                  autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Rechercher une personne',
                     border: InputBorder.none,

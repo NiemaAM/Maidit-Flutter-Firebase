@@ -1,11 +1,15 @@
-// ignore_for_file: file_names, no_leading_underscores_for_local_identifiers
+// ignore_for_file: file_names, no_leading_underscores_for_local_identifiers, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:maidit/Pages/Login%20and%20SignIn/FirstStep.dart';
+import 'package:maidit/Pages/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../firebase_options.dart';
+import '../../model/Authentication.dart';
 import 'LogIn.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,12 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPageHome() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const LogIn(),
-      ),
-    );
+    isUserLogged();
   }
 
   void navigationPageWel() {
@@ -50,10 +49,38 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  intFirebase() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  isUserLogged() async {
+    await Firebase.initializeApp();
+    Authentication auth = Authentication();
+    bool logged = await auth.isUserLogedIn();
+    if (logged) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Home(),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LogIn(),
+        ),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     startTime();
+    intFirebase();
   }
 
   @override

@@ -40,6 +40,9 @@ dependencies:
   email_validator: ^2.1.17
   shared_preferences: ^2.0.18
   table_calendar: ^3.0.9
+  cloud_firestore: ^4.4.4
+  firebase_auth: ^4.2.2
+  firebase_storage: ^11.0.15
 
 dev_dependencies:
   flutter_test:

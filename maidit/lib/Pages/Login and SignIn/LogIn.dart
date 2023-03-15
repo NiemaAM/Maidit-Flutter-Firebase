@@ -1,7 +1,8 @@
-// ignore_for_file: file_names, non_constant_identifier_names
+// ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import '../../model/Authentication.dart';
 import 'SignInChooseProfil.dart';
 import 'package:maidit/Pages/home.dart';
 
@@ -16,6 +17,23 @@ class _LogInState extends State<LogIn> {
   final TextEditingController _EmailController = TextEditingController();
   final TextEditingController _PasswordController = TextEditingController();
   bool _passwordVisible = false;
+
+  LogAccount(String email, String password) async {
+    Authentication auth = Authentication();
+    String? errorMessage = await auth.logIn(email, password);
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 239, 31, 118),
+          content: Text('Identifiants incorrectes')));
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Home(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +147,8 @@ class _LogInState extends State<LogIn> {
                                         Color.fromARGB(255, 239, 31, 118),
                                     content: Text('Adresse mail non valide')));
                           } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Home(),
-                              ),
-                            );
+                            LogAccount(_EmailController.text,
+                                _PasswordController.text);
                           }
                         },
                         child: SizedBox(

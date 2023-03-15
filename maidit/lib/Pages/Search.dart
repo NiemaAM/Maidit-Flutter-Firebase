@@ -18,8 +18,31 @@ class _SearchState extends State<Search> {
   bool _Filterpressed = false;
   final TextEditingController _searchController = TextEditingController();
 
+  List<Maid> _searchResults = [];
   void _handleSearch(String query) {
-    setState(() {});
+    setState(() {
+      _searchResults = widget.maids
+          .where((maid) => maid.tags!.any((tag) =>
+              tag.toLowerCase().contains(query.toLowerCase()) ||
+              maid.nom.toLowerCase().contains(query.toLowerCase()) ||
+              maid.prenom.toLowerCase().contains(query.toLowerCase()) ||
+              maid.description.toLowerCase().contains(query.toLowerCase())))
+          .toList();
+    });
+  }
+
+  void _handleFilter(String service, String gender, DateTime date) {
+    setState(() {
+      _searchResults = widget.maids
+          .where((maid) => maid.tags!.any((tag) =>
+              tag.toLowerCase().contains(service.toLowerCase()) &&
+              maid.genre.toLowerCase().contains(gender.toLowerCase()) &&
+              !maid.events!.any((event) =>
+                  event.year == date.year &&
+                  event.month == date.month &&
+                  event.day == date.day)))
+          .toList();
+    });
   }
 
   String? selectedGender;
@@ -40,7 +63,7 @@ class _SearchState extends State<Search> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
-        lastDate: DateTime(2025));
+        lastDate: DateTime.now().add(const Duration(days: 60)));
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
@@ -49,11 +72,20 @@ class _SearchState extends State<Search> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _searchResults = widget.maids;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: _Searchpressed
               ? TextField(
+                  autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Rechercher un profil',
                     border: InputBorder.none,
@@ -76,8 +108,6 @@ class _SearchState extends State<Search> {
                 onPressed: () {
                   setState(() {
                     _Searchpressed = !_Searchpressed;
-                    _searchController.clear();
-                    _handleSearch('');
                   });
                 },
                 icon: const Icon(Icons.search)),
@@ -85,11 +115,16 @@ class _SearchState extends State<Search> {
         ),
         body: Stack(
           children: [
-            ListView(
-              scrollDirection: Axis.vertical,
-              children:
-                  widget.maids.map((maid) => SearchBloc(maid: maid)).toList(),
-            ),
+            _searchResults.isNotEmpty
+                ? ListView.builder(
+                    itemCount: _searchResults.length,
+                    itemBuilder: (context, index) {
+                      return SearchBloc(maid: _searchResults[index]);
+                    },
+                  )
+                : const Center(
+                    child: Text("Aucun résultat trouvé"),
+                  ),
             AnimatedPositioned(
               duration: const Duration(milliseconds: 700),
               curve: Curves.easeInOut,
@@ -204,6 +239,10 @@ class _SearchState extends State<Search> {
                             padding: const EdgeInsets.only(left: 20),
                             child: TextButton(
                                 onPressed: () {
+                                  _handleFilter(
+                                      selectedService ?? '',
+                                      selectedGender ?? '',
+                                      selectedDate ?? DateTime(0, 0, 0));
                                   setState(() {
                                     _Filterpressed = false;
                                   });

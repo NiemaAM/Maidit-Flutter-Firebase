@@ -32,6 +32,7 @@ class _FavoritesState extends State<Favorites> {
         appBar: AppBar(
           title: _Searchpressed
               ? TextField(
+                  autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Rechercher un profil',
                     border: InputBorder.none,

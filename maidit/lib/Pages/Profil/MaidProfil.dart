@@ -134,7 +134,7 @@ class _MaidProfilState extends State<MaidProfil> {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Salma Boutine"),
+        title: Text("${widget.maid.nom} ${widget.maid.prenom}"),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark))
         ],
@@ -190,10 +190,24 @@ class _MaidProfilState extends State<MaidProfil> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 150, right: 30),
-            child: ElevatedButton(
-                onPressed: () {}, child: const Text("Contacter")),
+          Row(
+            children: [
+              const Expanded(child: SizedBox()),
+              widget.maid.certified
+                  ? Image.network(
+                      "https://cdn-icons-png.flaticon.com/512/5733/5733819.png",
+                      width: 30,
+                    )
+                  : const SizedBox(
+                      width: 30,
+                    ),
+              const Expanded(child: SizedBox()),
+              SizedBox(
+                  width: 160,
+                  child: ElevatedButton(
+                      onPressed: () {}, child: const Text("Contacter"))),
+              const Expanded(child: SizedBox()),
+            ],
           ),
           Row(
             children: [

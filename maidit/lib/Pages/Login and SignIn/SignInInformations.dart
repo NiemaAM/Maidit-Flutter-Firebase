@@ -3,6 +3,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maidit/model/UserFirebaseService.dart';
+import 'package:maidit/model/UserModel.dart';
 import 'SignInCreateProfil.dart';
 
 class SignInInformations extends StatefulWidget {
@@ -19,6 +21,36 @@ class _SignInInformationsState extends State<SignInInformations> {
   final TextEditingController _PrenomController = TextEditingController();
   final TextEditingController _PhoneController = TextEditingController();
   bool _passwordVisible = false;
+
+  CreateAccount(String nom, String prenom, String email, String password,
+      int phone) async {
+    User createduser = User(
+      id: '',
+      nom: nom,
+      prenom: prenom,
+      genre: '',
+      email: email,
+      phone: phone,
+      ville: '',
+      adresse: '',
+      registerDate: DateTime.now(),
+      description: '',
+      photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+      tags: [],
+      events: {},
+      savedMaids: [],
+      messages: {},
+      history: {},
+    );
+    UserFirebaseService usr = UserFirebaseService();
+    usr.createUser(createduser, email, password);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SignInCreateProfil(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,12 +254,12 @@ class _SignInInformationsState extends State<SignInInformations> {
                         backgroundColor: Color.fromARGB(255, 0, 105, 242),
                         content: Text('Numéro de téléphone non valide')));
                   } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SignInCreateProfil(),
-                      ),
-                    );
+                    CreateAccount(
+                        _NomController.text,
+                        _PrenomController.text,
+                        _EmailController.text,
+                        _PasswordController.text,
+                        int.parse(_PhoneController.text));
                   }
                 },
                 child: Row(
