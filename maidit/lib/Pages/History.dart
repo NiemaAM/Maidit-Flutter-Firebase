@@ -3,8 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:maidit/widgets/Bloc/HistoryBloc.dart';
 
+import '../model/MaidModel.dart';
+
 class History extends StatefulWidget {
-  const History({super.key});
+  final List<Maid> maids;
+  const History({super.key, required this.maids});
 
   @override
   State<History> createState() => _HistoryState();
@@ -48,11 +51,10 @@ class _HistoryState extends State<History> {
         ),
         body: ListView(
           scrollDirection: Axis.vertical,
-          children: const [
-            HistoryBloc(),
-            HistoryBloc(),
-            HistoryBloc(),
-            HistoryBloc(),
+          children: [
+            HistoryBloc(
+              maid: widget.maids[0],
+            ),
           ],
         ));
   }

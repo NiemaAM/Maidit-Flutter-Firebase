@@ -2,8 +2,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../Pages/Profil/MaidProfil.dart';
+import '../../model/MaidModel.dart';
+import '../RatingStars.dart';
+
 class SearchBloc extends StatefulWidget {
-  const SearchBloc({super.key});
+  final Maid maid;
+  const SearchBloc({super.key, required this.maid});
 
   @override
   State<SearchBloc> createState() => _SearchBlocState();
@@ -32,69 +37,60 @@ class _SearchBlocState extends State<SearchBloc> {
           Positioned.fill(
             child: Row(
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 15, right: 15),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                        "https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=1060&t=st=1678653484~exp=1678654084~hmac=cc0aaa0057aa2056f47cc2a4520f4b3d85dfe8199dd8c5d6853cc32dff2c1f00"),
+                    backgroundImage: NetworkImage(widget.maid.photo!),
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Expanded(flex: 6, child: SizedBox()),
-                    const SizedBox(
+                    SizedBox(
                       width: 150,
                       child: Text(
-                        "Salma Boutine",
+                        "${widget.maid.nom} ${widget.maid.prenom}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const Text(
-                      "Service",
-                      style: TextStyle(fontSize: 14, color: Colors.black45),
+                    Text(
+                      widget.maid.tags![0],
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.black45),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       width: 200,
                       child: Text(
-                        "Bonjour, je suis salma! je peux vous aider avec vos taches ménageres.",
+                        widget.maid.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 14,
                             color: Color.fromARGB(255, 9, 43, 104)),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.only(top: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star, color: Colors.grey),
-                          Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Text(
-                              "(000)",
-                              style: TextStyle(fontSize: 10),
-                            ),
-                          )
-                        ],
-                      ),
+                      child: RatingStars(
+                          rating: widget.maid.rating,
+                          nbrRating: widget.maid.nbrRating,
+                          withNumber: true),
                     ),
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MaidProfil(maid: widget.maid),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "Voir le profil",
                           style: TextStyle(

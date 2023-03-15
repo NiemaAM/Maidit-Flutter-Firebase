@@ -129,7 +129,7 @@ class _LogInState extends State<LogIn> {
                                         Color.fromARGB(255, 239, 31, 118),
                                     content: Text('Adresse mail non valide')));
                           } else {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const Home(),

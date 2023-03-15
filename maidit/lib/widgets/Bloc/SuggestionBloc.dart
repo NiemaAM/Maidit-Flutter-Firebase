@@ -1,9 +1,14 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:maidit/Pages/Profil/MaidProfil.dart';
+
+import '../../model/MaidModel.dart';
+import '../RatingStars.dart';
 
 class SuggestionBloc extends StatefulWidget {
-  const SuggestionBloc({super.key});
+  final Maid maid;
+  const SuggestionBloc({super.key, required this.maid});
 
   @override
   State<SuggestionBloc> createState() => _SuggestionBlocState();
@@ -57,56 +62,55 @@ class _SuggestionBlocState extends State<SuggestionBloc> {
                 children: [
                   Container(
                     padding: const EdgeInsets.only(top: 25),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(
-                          "https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=1060&t=st=1678653484~exp=1678654084~hmac=cc0aaa0057aa2056f47cc2a4520f4b3d85dfe8199dd8c5d6853cc32dff2c1f00"),
+                      backgroundImage: NetworkImage(widget.maid.photo!),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 15),
                     width: 150,
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        "Salma Boutine",
+                        "${widget.maid.nom} ${widget.maid.prenom}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 150,
                     child: Center(
                       child: Text(
-                        "Bonjour, je suis salma! je peux vous aider avec vos taches ménageres.",
+                        widget.maid.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 14, color: Colors.black45),
+                        style: const TextStyle(
+                            fontSize: 14, color: Colors.black45),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.star,
-                            color: Color.fromARGB(255, 255, 215, 16)),
-                        Icon(Icons.star,
-                            color: Color.fromARGB(255, 255, 215, 16)),
-                        Icon(Icons.star,
-                            color: Color.fromARGB(255, 255, 215, 16)),
-                        Icon(Icons.star,
-                            color: Color.fromARGB(255, 255, 215, 16)),
-                        Icon(Icons.star, color: Colors.grey),
-                      ],
-                    ),
+                    child: RatingStars(
+                        rating: widget.maid.rating,
+                        nbrRating: widget.maid.nbrRating,
+                        withNumber: false),
                   ),
-                  TextButton(onPressed: () {}, child: const Text("Consulter")),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MaidProfil(maid: widget.maid),
+                          ),
+                        );
+                      },
+                      child: const Text("Consulter")),
                   const SizedBox(height: 5)
                 ],
               ),

@@ -38,6 +38,8 @@ dependencies:
   connectivity: ^3.0.6
   image_picker: ^0.8.7
   email_validator: ^2.1.17
+  shared_preferences: ^2.0.18
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:

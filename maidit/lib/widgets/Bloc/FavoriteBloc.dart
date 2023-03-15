@@ -2,8 +2,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../Pages/Profil/MaidProfil.dart';
+import '../../model/MaidModel.dart';
+import '../RatingStars.dart';
+
 class FavoriteBloc extends StatefulWidget {
-  const FavoriteBloc({super.key});
+  final Maid maid;
+  const FavoriteBloc({super.key, required this.maid});
 
   @override
   State<FavoriteBloc> createState() => _FavoriteBlocState();
@@ -71,23 +76,19 @@ class _FavoriteBlocState extends State<FavoriteBloc> {
                     ),
                     Container(
                       padding: const EdgeInsets.only(top: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star,
-                              color: Color.fromARGB(255, 255, 215, 16)),
-                          Icon(Icons.star, color: Colors.grey),
-                        ],
-                      ),
+                      child: const RatingStars(
+                          rating: 2.7, nbrRating: 0, withNumber: false),
                     ),
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MaidProfil(maid: widget.maid),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "Voir le profil",
                           style: TextStyle(

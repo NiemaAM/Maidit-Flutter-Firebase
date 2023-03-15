@@ -3,8 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:maidit/widgets/Bloc/FavoriteBloc.dart';
 
+import '../model/MaidModel.dart';
+
 class Favorites extends StatefulWidget {
-  const Favorites({super.key});
+  final List<Maid> maids; //TODO: change this to savedmaids
+  const Favorites({super.key, required this.maids});
 
   @override
   State<Favorites> createState() => _FavoritesState();
@@ -16,6 +19,11 @@ class _FavoritesState extends State<Favorites> {
 
   void _handleSearch(String query) {
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -48,11 +56,10 @@ class _FavoritesState extends State<Favorites> {
         ),
         body: ListView(
           scrollDirection: Axis.vertical,
-          children: const [
-            FavoriteBloc(),
-            FavoriteBloc(),
-            FavoriteBloc(),
-            FavoriteBloc(),
+          children: [
+            FavoriteBloc(
+              maid: widget.maids[0],
+            ),
           ],
         ));
   }

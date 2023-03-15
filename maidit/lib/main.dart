@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: depend_on_referenced_packages
 
-import 'Pages/Login and SignIn/FirstStep.dart';
+import 'package:flutter/material.dart';
+import 'package:maidit/Pages/Login%20and%20SignIn/SplashScreen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,11 +43,12 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    initializeDateFormatting('fr_FR');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'MaidIt',
       theme: myTheme,
-      home: const FirstStep(),
+      home: const SplashScreen(),
     );
   }
 }

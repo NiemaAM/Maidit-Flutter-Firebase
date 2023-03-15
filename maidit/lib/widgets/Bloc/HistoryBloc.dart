@@ -2,8 +2,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../../Pages/Profil/MaidProfil.dart';
+import '../../model/MaidModel.dart';
+
 class HistoryBloc extends StatefulWidget {
-  const HistoryBloc({super.key});
+  final Maid maid;
+  const HistoryBloc({super.key, required this.maid});
 
   @override
   State<HistoryBloc> createState() => _HistoryBlocState();
@@ -71,7 +75,15 @@ class _HistoryBlocState extends State<HistoryBloc> {
                           fontSize: 14, color: Color.fromARGB(255, 9, 43, 104)),
                     ),
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MaidProfil(maid: widget.maid),
+                            ),
+                          );
+                        },
                         child: const Text(
                           "Voir le profil",
                           style: TextStyle(

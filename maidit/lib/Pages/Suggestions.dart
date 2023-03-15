@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../model/MaidModel.dart';
 import '../widgets/Bloc/SuggestionBloc.dart';
 
 class Suggestions extends StatefulWidget {
-  const Suggestions({super.key});
+  final List<Maid> maids;
+  const Suggestions({super.key, required this.maids});
 
   @override
   State<Suggestions> createState() => _SuggestionsState();
@@ -56,12 +58,9 @@ class _SuggestionsState extends State<Suggestions> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.only(left: 10),
-                children: const [
-                  SuggestionBloc(),
-                  SuggestionBloc(),
-                  SuggestionBloc(),
-                  SuggestionBloc(),
-                ],
+                children: widget.maids
+                    .map((maid) => SuggestionBloc(maid: maid))
+                    .toList(),
               ),
             ),
           ],

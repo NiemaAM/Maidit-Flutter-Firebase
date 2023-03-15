@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../model/MaidModel.dart';
 import '../widgets/Bloc/SearchBloc.dart';
 
 class Search extends StatefulWidget {
-  const Search({super.key});
+  final List<Maid> maids;
+  const Search({super.key, required this.maids});
 
   @override
   State<Search> createState() => _SearchState();
@@ -85,12 +87,8 @@ class _SearchState extends State<Search> {
           children: [
             ListView(
               scrollDirection: Axis.vertical,
-              children: const [
-                SearchBloc(),
-                SearchBloc(),
-                SearchBloc(),
-                SearchBloc(),
-              ],
+              children:
+                  widget.maids.map((maid) => SearchBloc(maid: maid)).toList(),
             ),
             AnimatedPositioned(
               duration: const Duration(milliseconds: 700),

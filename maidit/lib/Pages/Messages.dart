@@ -51,10 +51,18 @@ class _MessagesState extends State<Messages> {
           padding: const EdgeInsets.only(top: 10),
           scrollDirection: Axis.vertical,
           children: const [
-            MessageBloc(),
-            MessageBloc(),
-            MessageBloc(),
-            MessageBloc(),
+            MessageBloc(
+              id: '',
+            ),
+            MessageBloc(
+              id: '',
+            ),
+            MessageBloc(
+              id: '',
+            ),
+            MessageBloc(
+              id: '',
+            ),
           ],
         ));
   }

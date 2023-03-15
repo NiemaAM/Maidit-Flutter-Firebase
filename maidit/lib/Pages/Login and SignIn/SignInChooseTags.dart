@@ -175,7 +175,7 @@ class _SignInChooseTagsState extends State<SignInChooseTags> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Home(),

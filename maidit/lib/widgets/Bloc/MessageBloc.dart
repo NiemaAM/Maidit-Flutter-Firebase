@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 
 class MessageBloc extends StatefulWidget {
-  const MessageBloc({super.key});
+  final String id;
+  const MessageBloc({super.key, required this.id});
 
   @override
   State<MessageBloc> createState() => _MessageBlocState();

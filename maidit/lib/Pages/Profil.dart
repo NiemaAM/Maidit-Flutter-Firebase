@@ -2,11 +2,16 @@
 
 import 'package:flutter/material.dart';
 
+import '../model/UserModel.dart';
 import 'Profil/ViewMyProfil.dart';
 import 'Profil/EditMyProfil.dart';
 
 class Profil extends StatefulWidget {
-  const Profil({super.key});
+  final User user;
+  const Profil({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<Profil> createState() => _ProfilState();
@@ -31,6 +36,9 @@ class _ProfilState extends State<Profil> {
                 icon: const Icon(Icons.edit)),
           ],
         ),
-        body: const SingleChildScrollView(child: ViewMyProfil()));
+        body: SingleChildScrollView(
+            child: ViewMyProfil(
+          user: widget.user,
+        )));
   }
 }
