@@ -2,7 +2,9 @@
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:maidit/model/UserFirebaseService.dart';
 import '../../model/Authentication.dart';
+import '../../model/UserModel.dart';
 import 'SignInChooseProfil.dart';
 import 'package:maidit/Pages/home.dart';
 
@@ -17,6 +19,22 @@ class _LogInState extends State<LogIn> {
   final TextEditingController _EmailController = TextEditingController();
   final TextEditingController _PasswordController = TextEditingController();
   bool _passwordVisible = false;
+  User? currentUser = User(
+    id: '',
+    nom: '',
+    prenom: '',
+    genre: '',
+    email: '',
+    phone: 0,
+    ville: '',
+    adresse: '',
+    registerDate: DateTime(0, 0, 0),
+    description: '',
+    photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    tags: [],
+    events: {},
+    savedMaids: [],
+  );
 
   LogAccount(String email, String password) async {
     Authentication auth = Authentication();
@@ -26,10 +44,16 @@ class _LogInState extends State<LogIn> {
           backgroundColor: Color.fromARGB(255, 239, 31, 118),
           content: Text('Identifiants incorrectes')));
     } else {
+      UserFirebaseService usr = UserFirebaseService();
+      currentUser = await usr.getUser();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const Home(),
+          builder: (context) => Home(
+            user: currentUser!,
+            maids: const [],
+            savedmaids: const [],
+          ),
         ),
       );
     }

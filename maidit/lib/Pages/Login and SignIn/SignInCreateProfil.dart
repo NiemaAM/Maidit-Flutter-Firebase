@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../model/MaidFirebaseService.dart';
 import '../../model/UserFirebaseService.dart';
 import 'SignInChooseTags.dart';
 
 class SignInCreateProfil extends StatefulWidget {
-  const SignInCreateProfil({super.key});
+  final int profilType;
+  const SignInCreateProfil({super.key, required this.profilType});
 
   @override
   State<SignInCreateProfil> createState() => _SignInCreateProfilState();
@@ -29,16 +31,30 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
     });
   }
 
-  CreateAccount(String description, File photo, String genre, String ville,
-      String adresse) async {
-    UserFirebaseService usr = UserFirebaseService();
-    usr.updateUser(description, photo, genre, ville, adresse);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SignInChooseTags(),
-      ),
-    );
+  CreateAccount(String description, File photo) async {
+    if (widget.profilType == 0) {
+      UserFirebaseService usr = UserFirebaseService();
+      usr.updateUser(description, photo);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignInChooseTags(
+            profilType: widget.profilType,
+          ),
+        ),
+      );
+    } else {
+      MaidFirebaseService md = MaidFirebaseService();
+      md.updateMaid(description, photo);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignInChooseTags(
+            profilType: widget.profilType,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -205,8 +221,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
                 onPressed: () {
-                  CreateAccount(
-                      _DescriptionController.text, _image!, '', '', '');
+                  CreateAccount(_DescriptionController.text, _image!);
                 },
                 child: Row(
                   children: const [

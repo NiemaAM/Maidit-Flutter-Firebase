@@ -1,19 +1,33 @@
-// ignore_for_file: file_names
-
+// ignore_for_file: file_names, no_leading_underscores_for_local_identifiers
 import 'package:flutter/material.dart';
-
+import 'package:maidit/model/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 import '../widgets/Bloc/SuggestionBloc.dart';
 
 class Suggestions extends StatefulWidget {
-  final List<Maid> maids;
-  const Suggestions({super.key, required this.maids});
+  const Suggestions({super.key});
 
   @override
   State<Suggestions> createState() => _SuggestionsState();
 }
 
 class _SuggestionsState extends State<Suggestions> {
+  List<Maid> randomMaids = [];
+
+  Future<void> getRandomMaids() async {
+    MaidFirebaseService md = MaidFirebaseService();
+    List<Maid> _randomMaids = await md.getSomeMaids();
+    setState(() {
+      randomMaids = _randomMaids;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getRandomMaids();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,13 +69,15 @@ class _SuggestionsState extends State<Suggestions> {
             ),
             SizedBox(
               height: 340,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 10),
-                children: widget.maids
-                    .map((maid) => SuggestionBloc(maid: maid))
-                    .toList(),
-              ),
+              child: randomMaids.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(left: 10),
+                      children: randomMaids
+                          .map((maid) => SuggestionBloc(maid: maid))
+                          .toList(),
+                    ),
             ),
           ],
         ),

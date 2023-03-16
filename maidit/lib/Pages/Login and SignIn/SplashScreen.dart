@@ -8,6 +8,8 @@ import 'package:maidit/Pages/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
 import '../../model/Authentication.dart';
+import '../../model/UserFirebaseService.dart';
+import '../../model/UserModel.dart';
 import 'LogIn.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -24,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? firstTime = prefs.getBool('first_time');
 
-    var _duration = const Duration(seconds: 3);
+    var _duration = const Duration(seconds: 2);
 
     if (firstTime != null && !firstTime) {
       // Not first time
@@ -55,15 +57,37 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  User? currentUser = User(
+    id: '',
+    nom: '',
+    prenom: '',
+    genre: '',
+    email: '',
+    phone: 0,
+    ville: '',
+    adresse: '',
+    registerDate: DateTime(0, 0, 0),
+    description: '',
+    photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    tags: [],
+    events: {},
+    savedMaids: [],
+  );
   isUserLogged() async {
     await Firebase.initializeApp();
     Authentication auth = Authentication();
     bool logged = await auth.isUserLogedIn();
     if (logged) {
+      UserFirebaseService usr = UserFirebaseService();
+      currentUser = await usr.getUser();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const Home(),
+          builder: (context) => Home(
+            user: currentUser!,
+            maids: const [],
+            savedmaids: const [],
+          ),
         ),
       );
     } else {
@@ -79,8 +103,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    startTime();
     intFirebase();
+    startTime();
   }
 
   @override

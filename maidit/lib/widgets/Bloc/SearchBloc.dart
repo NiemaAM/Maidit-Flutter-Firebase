@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../Pages/Profil/MaidProfil.dart';
 import '../../model/MaidModel.dart';
+import '../../model/UserFirebaseService.dart';
 import '../RatingStars.dart';
 
 class SearchBloc extends StatefulWidget {
@@ -15,6 +16,34 @@ class SearchBloc extends StatefulWidget {
 }
 
 class _SearchBlocState extends State<SearchBloc> {
+  bool _isFavorite = false;
+
+  Future<void> _checkIfFavorite() async {
+    UserFirebaseService usr = UserFirebaseService();
+    bool isFavorite = await usr.isMaidFavorite(widget.maid.id);
+    setState(() {
+      _isFavorite = isFavorite;
+    });
+  }
+
+  Future<void> addToFavorites() async {
+    UserFirebaseService usr = UserFirebaseService();
+    if (_isFavorite) {
+      await usr.updateUserRemoveFavorite(widget.maid.id);
+    } else {
+      await usr.updateUserAddFavorite(widget.maid.id);
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,9 +57,14 @@ class _SearchBlocState extends State<SearchBloc> {
             top: 0,
             right: 0,
             child: IconButton(
-              icon: const Icon(Icons.bookmark_border),
+              icon: _isFavorite
+                  ? const Icon(Icons.bookmark)
+                  : const Icon(Icons.bookmark_border),
               onPressed: () {
-                // handle icon press
+                setState(() {
+                  _isFavorite != _isFavorite;
+                });
+                addToFavorites();
               },
             ),
           ),

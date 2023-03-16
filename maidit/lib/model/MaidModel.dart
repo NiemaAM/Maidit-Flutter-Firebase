@@ -1,4 +1,6 @@
 // ignore_for_file: file_names
+import 'dart:convert';
+
 class Maid {
   String id = '';
   String nom = '';
@@ -90,9 +92,9 @@ class Maid {
       events: (map['events'] as List<dynamic>?)
           ?.map((e) => DateTime.parse(e))
           .toList(),
-      prixMin: map['prixMin'],
-      prixMax: map['prixMax'],
-      rating: map['rating'],
+      prixMin: map['prixMin'].toDouble(),
+      prixMax: map['prixMax'].toDouble(),
+      rating: map['rating'].toDouble(),
       nbrRating: map['nbrRating'],
       certified: map['certified'],
       coments: (map['comments'] as Map<String, dynamic>?)?.map((k, v) {
@@ -103,5 +105,11 @@ class Maid {
         }));
       }),
     );
+  }
+
+  String getMaidAsSteam() {
+    final map = toMap();
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(map);
   }
 }

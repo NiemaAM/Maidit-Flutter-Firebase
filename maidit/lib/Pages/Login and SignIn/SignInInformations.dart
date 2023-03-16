@@ -3,12 +3,16 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maidit/model/MaidFirebaseService.dart';
 import 'package:maidit/model/UserFirebaseService.dart';
 import 'package:maidit/model/UserModel.dart';
+import '../../model/MaidModel.dart';
+import '../../model/UserHistory.dart';
 import 'SignInCreateProfil.dart';
 
 class SignInInformations extends StatefulWidget {
-  const SignInInformations({super.key});
+  final int profilType;
+  const SignInInformations({super.key, required this.profilType});
 
   @override
   State<SignInInformations> createState() => _SignInInformationsState();
@@ -20,36 +24,87 @@ class _SignInInformationsState extends State<SignInInformations> {
   final TextEditingController _NomController = TextEditingController();
   final TextEditingController _PrenomController = TextEditingController();
   final TextEditingController _PhoneController = TextEditingController();
+  final TextEditingController _VilleController = TextEditingController();
+  final TextEditingController _AdresseController = TextEditingController();
+  String selectedGender = "Femme";
   bool _passwordVisible = false;
 
+  List<String> genres = ["Femme", "Homme"];
+
   CreateAccount(String nom, String prenom, String email, String password,
-      int phone) async {
-    User createduser = User(
-      id: '',
-      nom: nom,
-      prenom: prenom,
-      genre: '',
-      email: email,
-      phone: phone,
-      ville: '',
-      adresse: '',
-      registerDate: DateTime.now(),
-      description: '',
-      photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
-      tags: [],
-      events: {},
-      savedMaids: [],
-      messages: {},
-      history: {},
-    );
-    UserFirebaseService usr = UserFirebaseService();
-    usr.createUser(createduser, email, password);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SignInCreateProfil(),
-      ),
-    );
+      int phone, String ville, String adresse, String genre) async {
+    if (widget.profilType == 0) {
+      User createduser = User(
+        id: '',
+        nom: nom,
+        prenom: prenom,
+        genre: genre,
+        email: email,
+        phone: phone,
+        ville: ville,
+        adresse: adresse,
+        registerDate: DateTime.now(),
+        description: '',
+        photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+        tags: [],
+        events: {},
+        savedMaids: [],
+        messages: {},
+        history: [
+          UserHistory(
+              maidId: '6G2BAPKg4AdmNA4uOIlCnUBZpGJ3',
+              service: 'Cuisine',
+              serviceState: 0,
+              serviceDate: DateTime.now()),
+          UserHistory(
+              maidId: 'VBTw4YaWuSTZgNJDI7sEj76ADWI3',
+              service: 'Cuisine',
+              serviceState: 3,
+              serviceDate: DateTime.now())
+        ],
+      );
+      UserFirebaseService usr = UserFirebaseService();
+      usr.createUser(createduser, email, password);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignInCreateProfil(
+            profilType: widget.profilType,
+          ),
+        ),
+      );
+    } else {
+      Maid createdMaid = Maid(
+          id: '',
+          nom: nom,
+          prenom: prenom,
+          genre: genre,
+          email: email,
+          phone: 0,
+          ville: ville,
+          adresse: adresse,
+          registerDate: DateTime.now(),
+          description: '',
+          photo: 'https://cdn-icons-png.flaticon.com/512/3177/3177440.png',
+          tags: [],
+          events: [],
+          prixMin: 0,
+          prixMax: 0,
+          rating: 0,
+          nbrRating: 0,
+          certified: false,
+          coments: {});
+      MaidFirebaseService md = MaidFirebaseService();
+      md.createMaid(createdMaid, email, password);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignInCreateProfil(
+            profilType: widget.profilType,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -198,6 +253,73 @@ class _SignInInformationsState extends State<SignInInformations> {
           ),
         ),
         Padding(
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: TextField(
+            controller: _VilleController,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+              LengthLimitingTextInputFormatter(25),
+            ],
+            decoration: const InputDecoration(
+              labelText: 'Ville*',
+              labelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: TextField(
+            controller: _AdresseController,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(25),
+            ],
+            decoration: const InputDecoration(
+              labelText: 'Adresse*',
+              labelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: DropdownButtonFormField<String>(
+            decoration: const InputDecoration(
+              labelText: 'Genre*',
+              labelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue, width: 2),
+              ),
+            ),
+            value: selectedGender,
+            items: genres
+                .map<DropdownMenuItem<String>>(
+                    (String value) => DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        ))
+                .toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedGender = newValue!;
+              });
+            },
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.only(bottom: 40, top: 40),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -236,7 +358,9 @@ class _SignInInformationsState extends State<SignInInformations> {
                       _PasswordController.text.isEmpty ||
                       _NomController.text.isEmpty ||
                       _PrenomController.text.isEmpty ||
-                      _PhoneController.text.isEmpty) {
+                      _PhoneController.text.isEmpty ||
+                      _VilleController.text.isEmpty ||
+                      _AdresseController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         backgroundColor: Color.fromARGB(255, 0, 105, 242),
                         content:
@@ -259,7 +383,10 @@ class _SignInInformationsState extends State<SignInInformations> {
                         _PrenomController.text,
                         _EmailController.text,
                         _PasswordController.text,
-                        int.parse(_PhoneController.text));
+                        int.parse(_PhoneController.text),
+                        _VilleController.text,
+                        _AdresseController.text,
+                        selectedGender);
                   }
                 },
                 child: Row(
@@ -273,6 +400,9 @@ class _SignInInformationsState extends State<SignInInformations> {
                 )),
           ),
         ),
+        const SizedBox(
+          height: 50,
+        )
       ]),
     );
   }

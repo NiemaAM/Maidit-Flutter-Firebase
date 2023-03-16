@@ -23,16 +23,14 @@ class UserFirebaseService {
     return cred.user!.uid;
   }
 
-  Future<void> updateUser(String description, File photo, String genre,
-      String ville, String adresse) async {
+  Future<void> updateUser(String description, File photo) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
 
     // Upload photo to Firebase Storage
     if (photo.path.length > 10) {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('users/profilPics/${userDoc.id}');
+      final storageRef =
+          FirebaseStorage.instance.ref().child('users/${userDoc.id}/profilPic');
       final uploadTask = storageRef.putFile(photo);
       final snapshot = await uploadTask.whenComplete(() => null);
       final photoUrl = await snapshot.ref.getDownloadURL();
@@ -43,10 +41,8 @@ class UserFirebaseService {
 
     // Update description and phone fields
     await userDoc.update({
+      'id': prefs.getString('uid'),
       'description': description,
-      'genre': genre,
-      'ville': ville,
-      'adresse': adresse,
     });
   }
 
@@ -59,12 +55,44 @@ class UserFirebaseService {
     });
   }
 
-  // Function to delete an existing user from Firebase
-  Future<void> deleteUser(String userId) async {
-    await _firestore.collection('users').doc(userId).delete();
+  Future<void> updateUserAddFavorite(String maidId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    // Update description and phone fields
+    await userDoc.update({
+      'savedMaids': FieldValue.arrayUnion([maidId]),
+    });
+  }
+
+  Future<void> updateUserRemoveFavorite(String maidId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await userDoc.get();
+    List<String> savedMaids =
+        List<String>.from(snapshot.data()?['savedMaids'] ?? []);
+    if (savedMaids.contains(maidId)) {
+      // Update savedMaids field by removing the maidId
+      await userDoc.update({
+        'savedMaids': FieldValue.arrayRemove([maidId]),
+      });
+    } else {}
+  }
+
+  Future<bool> isMaidFavorite(String maidId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await userDoc.get();
+    List<String> savedMaids =
+        List<String>.from(snapshot.data()?['savedMaids'] ?? []);
+    if (savedMaids.contains(maidId)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // Function to get an existing user from Firebase
+  // ignore: body_might_complete_normally_nullable
   Future<User?> getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     DocumentSnapshot<Map<String, dynamic>> snapshot =
@@ -72,6 +100,14 @@ class UserFirebaseService {
     if (!snapshot.exists) {
       return null;
     }
-    return User.fromMap(snapshot.data()!);
+    if (snapshot.exists) {
+      return User.fromMap(snapshot.data()!);
+    }
+  }
+
+  // Function to delete an existing user from Firebase
+  Future<void> deleteUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await _firestore.collection('users').doc(prefs.getString('uid')).delete();
   }
 }

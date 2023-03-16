@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../Pages/Profil/MaidProfil.dart';
 import '../../model/MaidModel.dart';
+import '../../model/UserFirebaseService.dart';
 import '../RatingStars.dart';
 
 class FavoriteBloc extends StatefulWidget {
@@ -15,6 +16,34 @@ class FavoriteBloc extends StatefulWidget {
 }
 
 class _FavoriteBlocState extends State<FavoriteBloc> {
+  bool _isFavorite = false;
+
+  Future<void> _checkIfFavorite() async {
+    UserFirebaseService usr = UserFirebaseService();
+    bool isFavorite = await usr.isMaidFavorite(widget.maid.id);
+    setState(() {
+      _isFavorite = isFavorite;
+    });
+  }
+
+  Future<void> addToFavorites() async {
+    UserFirebaseService usr = UserFirebaseService();
+    if (_isFavorite) {
+      await usr.updateUserRemoveFavorite(widget.maid.id);
+    } else {
+      await usr.updateUserAddFavorite(widget.maid.id);
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavorite();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,56 +57,63 @@ class _FavoriteBlocState extends State<FavoriteBloc> {
             top: 0,
             right: 0,
             child: IconButton(
-              icon: const Icon(Icons.bookmark),
+              icon: _isFavorite
+                  ? const Icon(Icons.bookmark)
+                  : const Icon(Icons.bookmark_border),
               onPressed: () {
-                // handle icon press
+                setState(() {
+                  _isFavorite != _isFavorite;
+                });
+                addToFavorites();
               },
             ),
           ),
           Positioned.fill(
             child: Row(
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 15, right: 15),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                        "https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=1060&t=st=1678653484~exp=1678654084~hmac=cc0aaa0057aa2056f47cc2a4520f4b3d85dfe8199dd8c5d6853cc32dff2c1f00"),
+                    backgroundImage: NetworkImage(widget.maid.photo!),
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Expanded(flex: 6, child: SizedBox()),
-                    const SizedBox(
+                    SizedBox(
                       width: 150,
                       child: Text(
-                        "Salma Boutine",
+                        "${widget.maid.nom} ${widget.maid.prenom}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const Text(
-                      "Service",
-                      style: TextStyle(fontSize: 14, color: Colors.black45),
+                    Text(
+                      widget.maid.tags![0],
+                      style:
+                          const TextStyle(fontSize: 14, color: Colors.black45),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       width: 200,
                       child: Text(
-                        "Bonjour, je suis salma! je peux vous aider avec vos taches ménageres.",
+                        widget.maid.description,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 14,
                             color: Color.fromARGB(255, 9, 43, 104)),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.only(top: 15),
-                      child: const RatingStars(
-                          rating: 2.7, nbrRating: 0, withNumber: false),
+                      child: RatingStars(
+                          rating: widget.maid.rating,
+                          nbrRating: widget.maid.nbrRating,
+                          withNumber: false),
                     ),
                     TextButton(
                         onPressed: () {

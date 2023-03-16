@@ -1,5 +1,9 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
+import 'UserHistory.dart';
+
 class User {
   String id = '';
   String nom = '';
@@ -15,10 +19,10 @@ class User {
   List<String>? tags = [];
   Map<DateTime, List<String>?>? events = {};
   List<String>? savedMaids = [];
-  Map<String /*maid id*/, Map<int /*state*/, DateTime /*date*/ >>? history = {};
-  Map<Map<String /*maid id*/, Map<DateTime /*date*/, String /*message*/ >>,
-          Map<String /*user id*/, Map<DateTime /*date*/, String /*message*/ >>>?
-      messages = {};
+  List<UserHistory>? history = [];
+  //this field will be sorted by datetime and by id in the chat
+  Map<Map<String /*maid id*/, String /*user id*/ >,
+      Map<DateTime /*date and time*/, String /*message*/ >>? messages = {};
 
   User({
     required this.id,
@@ -48,44 +52,30 @@ class User {
       'phone': phone,
       'ville': ville,
       'adresse': adresse,
-      'registerDate': registerDate.millisecondsSinceEpoch,
+      'registerDate': registerDate.toIso8601String(),
       'description': description,
       'photo': photo,
       'tags': tags,
-      'events': events?.map((key, value) => MapEntry(
-            key.millisecondsSinceEpoch,
-            value,
-          )),
-      'savedMaids': savedMaids,
-      'history': history?.map((key, value) => MapEntry(
-            key,
-            value.map((key, value) => MapEntry(
-                  key,
-                  value.millisecondsSinceEpoch,
-                )),
-          )),
-      'messages': messages?.map((key, value) => MapEntry(
-            key.map((key, value) => MapEntry(
-                  key,
-                  value.map((key, value) => MapEntry(
-                        key.millisecondsSinceEpoch,
-                        value,
-                      )),
-                )),
-            value.map((key, value) => MapEntry(
-                  key,
-                  value.map((key, value) => MapEntry(
-                        key.millisecondsSinceEpoch,
-                        value,
-                      )),
-                )),
-          )),
+      'events':
+          events?.map((key, value) => MapEntry(key.toIso8601String(), value)) ??
+              {},
+      'savedMaids': savedMaids ?? [],
+      'history': history?.map((h) => h.toMap()).toList() ?? {},
+      'messages': messages?.map((maidUserIdMap, dateTimeMessageMap) {
+            return MapEntry(
+              maidUserIdMap.map(
+                  (key, value) => MapEntry(key.toString(), value.toString())),
+              dateTimeMessageMap.map((key, value) =>
+                  MapEntry(key.toIso8601String(), value.toString())),
+            );
+          }) ??
+          {}
     };
   }
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'],
+      id: map['id'] ?? '',
       nom: map['nom'],
       prenom: map['prenom'],
       genre: map['genre'],
@@ -93,72 +83,26 @@ class User {
       phone: map['phone'],
       ville: map['ville'],
       adresse: map['adresse'],
-      registerDate: DateTime.fromMillisecondsSinceEpoch(map['registerDate']),
+      registerDate: DateTime.parse(map['registerDate']),
       description: map['description'],
       photo: map['photo'],
       tags: List<String>.from(map['tags']),
-      events: map['events'] != null
-          ? Map<DateTime, List<String>?>.fromEntries(map['events'].map((entry) {
-              return MapEntry<DateTime, List<String>>(
-                DateTime.fromMillisecondsSinceEpoch(entry.key),
-                entry.value != null ? List<String>.from(entry.value) : [],
-              );
-            }))
-          : null,
+      events: (map['events'] as Map<String, dynamic>?)?.map(
+            (key, value) =>
+                MapEntry(DateTime.parse(key), value as List<String>?),
+          ) ??
+          {},
       savedMaids: List<String>.from(map['savedMaids']),
-      history: map['history'] != null
-          ? Map<String, Map<int, DateTime>>.fromEntries(map['history'].map(
-              (entry) {
-                return MapEntry<String, Map<int, DateTime>>(
-                  entry.key,
-                  Map<int, DateTime>.fromEntries(entry.value.map((entry) {
-                    return MapEntry<int, DateTime>(
-                      entry.key,
-                      DateTime.fromMillisecondsSinceEpoch(entry.value),
-                    );
-                  })),
-                );
-              },
-            ))
-          : null,
-      messages: map['messages'] != null
-          ? Map<Map<String, Map<DateTime, String>>,
-              Map<String, Map<DateTime, String>>>.fromEntries(
-              map['messages'].map(
-                (entry) {
-                  return MapEntry<Map<String, Map<DateTime, String>>,
-                      Map<String, Map<DateTime, String>>>(
-                    Map<String, Map<DateTime, String>>.fromEntries(
-                        entry.key.map((entry) {
-                      return MapEntry<String, Map<DateTime, String>>(
-                        entry.key,
-                        Map<DateTime, String>.fromEntries(
-                            entry.value.map((entry) {
-                          return MapEntry<DateTime, String>(
-                            DateTime.fromMillisecondsSinceEpoch(entry.key),
-                            entry.value,
-                          );
-                        })),
-                      );
-                    })),
-                    Map<String, Map<DateTime, String>>.fromEntries(
-                        entry.value.map((entry) {
-                      return MapEntry<String, Map<DateTime, String>>(
-                        entry.key,
-                        Map<DateTime, String>.fromEntries(
-                            entry.value.map((entry) {
-                          return MapEntry<DateTime, String>(
-                            DateTime.fromMillisecondsSinceEpoch(entry.key),
-                            entry.value,
-                          );
-                        })),
-                      );
-                    })),
-                  );
-                },
-              ),
-            )
-          : null,
+      history: (map['history'] as List<dynamic>?)
+          ?.map((h) => UserHistory.fromMap(h as Map<String, dynamic>))
+          .toList(),
+      messages: {}, //TODO: change this to add the messages
     );
+  }
+
+  String getUserAsStream() {
+    final map = toMap();
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(map);
   }
 }

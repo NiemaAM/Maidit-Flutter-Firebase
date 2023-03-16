@@ -13,6 +13,15 @@ class SignInChooseProfil extends StatefulWidget {
 class _SignInChooseProfilState extends State<SignInChooseProfil> {
   bool _isClient = true;
   bool _isMaid = false;
+  int profileType = 0;
+
+  int initProfilType() {
+    if (_isMaid) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,10 +179,12 @@ class _SignInChooseProfilState extends State<SignInChooseProfil> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const SignInInformations(),
+                      builder: (context) => SignInInformations(
+                        profilType: initProfilType(),
+                      ),
                     ),
                   );
                 },

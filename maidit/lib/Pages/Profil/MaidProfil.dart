@@ -68,7 +68,7 @@ class _MaidProfilState extends State<MaidProfil> {
             padding: const EdgeInsets.only(top: 10, bottom: 10),
             child: Center(
               child: Text(
-                '${widget.maid.prixMin} ~ ${widget.maid.prixMax} DHS',
+                '${widget.maid.prixMin.toInt()} ~ ${widget.maid.prixMax.toInt()} DHS',
                 style: const TextStyle(
                     color: Color.fromARGB(255, 0, 105, 242), fontSize: 18),
               ),

@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../model/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 import '../widgets/Bloc/SearchBloc.dart';
 
 class Search extends StatefulWidget {
-  final List<Maid> maids;
-  const Search({super.key, required this.maids});
+  const Search({super.key});
 
   @override
   State<Search> createState() => _SearchState();
@@ -17,11 +17,21 @@ class _SearchState extends State<Search> {
   bool _Searchpressed = false;
   bool _Filterpressed = false;
   final TextEditingController _searchController = TextEditingController();
+  List<Maid> allmaids = [];
+
+  Future<void> getAllMaids() async {
+    MaidFirebaseService md = MaidFirebaseService();
+    List<Maid> _allmaids = await md.getAllMaids();
+    setState(() {
+      allmaids = _allmaids;
+      _searchResults = _allmaids;
+    });
+  }
 
   List<Maid> _searchResults = [];
   void _handleSearch(String query) {
     setState(() {
-      _searchResults = widget.maids
+      _searchResults = allmaids
           .where((maid) => maid.tags!.any((tag) =>
               tag.toLowerCase().contains(query.toLowerCase()) ||
               maid.nom.toLowerCase().contains(query.toLowerCase()) ||
@@ -33,7 +43,7 @@ class _SearchState extends State<Search> {
 
   void _handleFilter(String service, String gender, DateTime date) {
     setState(() {
-      _searchResults = widget.maids
+      _searchResults = allmaids
           .where((maid) => maid.tags!.any((tag) =>
               tag.toLowerCase().contains(service.toLowerCase()) &&
               maid.genre.toLowerCase().contains(gender.toLowerCase()) &&
@@ -74,15 +84,14 @@ class _SearchState extends State<Search> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _searchResults = widget.maids;
-    });
+    getAllMaids();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: _Searchpressed
               ? TextField(
                   autofocus: true,
@@ -115,16 +124,18 @@ class _SearchState extends State<Search> {
         ),
         body: Stack(
           children: [
-            _searchResults.isNotEmpty
-                ? ListView.builder(
-                    itemCount: _searchResults.length,
-                    itemBuilder: (context, index) {
-                      return SearchBloc(maid: _searchResults[index]);
-                    },
-                  )
-                : const Center(
-                    child: Text("Aucun résultat trouvé"),
-                  ),
+            allmaids.isEmpty
+                ? const Center(child: CircularProgressIndicator())
+                : _searchResults.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          return SearchBloc(maid: _searchResults[index]);
+                        },
+                      )
+                    : const Center(
+                        child: Text("Aucun résultat trouvé"),
+                      ),
             AnimatedPositioned(
               duration: const Duration(milliseconds: 700),
               curve: Curves.easeInOut,

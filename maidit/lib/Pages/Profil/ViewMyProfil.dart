@@ -188,7 +188,7 @@ class _ViewMyProfilState extends State<ViewMyProfil> {
                 color: Colors.grey[50],
                 child: TableCalendar(
                   locale: 'fr_FR',
-                  firstDay: DateTime.now().subtract(const Duration(days: 60)),
+                  firstDay: widget.user.registerDate,
                   lastDay: DateTime.now().add(const Duration(days: 60)),
                   focusedDay: _focusedDay,
                   calendarFormat: CalendarFormat.month,

@@ -1,12 +1,17 @@
-// ignore_for_file: file_names, non_constant_identifier_names, deprecated_member_use
+// ignore_for_file: file_names, non_constant_identifier_names, deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:maidit/Pages/Login%20and%20SignIn/LogIn.dart';
 import 'package:maidit/Pages/home.dart';
 
+import '../../model/Authentication.dart';
+import '../../model/MaidFirebaseService.dart';
 import '../../model/UserFirebaseService.dart';
+import '../../model/UserModel.dart';
 
 class SignInChooseTags extends StatefulWidget {
-  const SignInChooseTags({super.key});
+  final int profilType;
+  const SignInChooseTags({super.key, required this.profilType});
 
   @override
   State<SignInChooseTags> createState() => _SignInChooseTagsState();
@@ -81,15 +86,56 @@ class _SignInChooseTagsState extends State<SignInChooseTags> {
     });
   }
 
+  User? currentUser = User(
+    id: '',
+    nom: '',
+    prenom: '',
+    genre: '',
+    email: '',
+    phone: 0,
+    ville: '',
+    adresse: '',
+    registerDate: DateTime(0, 0, 0),
+    description: '',
+    photo: "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+    tags: [],
+    events: {},
+    savedMaids: [],
+  );
+
   AddTags() async {
-    UserFirebaseService usr = UserFirebaseService();
-    usr.updateUserAddTags(_chosenTags);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-      ),
-    );
+    if (widget.profilType == 0) {
+      UserFirebaseService usr = UserFirebaseService();
+      usr.updateUserAddTags(_chosenTags);
+      currentUser = await usr.getUser();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 239, 31, 118),
+          content: Text('Votre compte a été créé avec succès !')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(
+            user: currentUser!,
+            maids: const [],
+            savedmaids: const [],
+          ),
+        ),
+      );
+    } else {
+      MaidFirebaseService md = MaidFirebaseService();
+      md.updateMaidAddTags(_chosenTags);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Color.fromARGB(255, 239, 31, 118),
+          content: Text('Maid créé avec succès !')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LogIn(),
+        ),
+      );
+      Authentication auth = Authentication();
+      auth.logOut();
+    }
   }
 
   @override
