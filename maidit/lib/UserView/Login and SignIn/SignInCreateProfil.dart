@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../model/MaidFirebaseService.dart';
-import '../../model/UserFirebaseService.dart';
+import '../../Controller/UserFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import 'SignInChooseTags.dart';
 
 class SignInCreateProfil extends StatefulWidget {

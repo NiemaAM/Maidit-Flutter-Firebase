@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../Pages/Profil/MaidProfil.dart';
+import '../../UserView/MaidPages/MaidProfil.dart';
 import '../../model/MaidModel.dart';
-import '../../model/UserFirebaseService.dart';
+import '../../Controller/UserFirebaseService.dart';
 import '../RatingStars.dart';
 
 class SearchBloc extends StatefulWidget {
@@ -36,6 +36,18 @@ class _SearchBlocState extends State<SearchBloc> {
     setState(() {
       _isFavorite = !_isFavorite;
     });
+  }
+
+  Future<void> _navigateToSecondPage() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MaidProfil(maid: widget.maid),
+      ),
+    );
+    if (result != null) {
+      _checkIfFavorite();
+    }
   }
 
   @override
@@ -85,7 +97,7 @@ class _SearchBlocState extends State<SearchBloc> {
                     SizedBox(
                       width: 150,
                       child: Text(
-                        "${widget.maid.nom} ${widget.maid.prenom}",
+                        "${widget.maid.nom.replaceFirst(widget.maid.nom.characters.first, widget.maid.nom.characters.first.toUpperCase())} ${widget.maid.prenom.replaceFirst(widget.maid.prenom.characters.first, widget.maid.prenom.characters.first.toUpperCase())}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -117,13 +129,7 @@ class _SearchBlocState extends State<SearchBloc> {
                     ),
                     TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  MaidProfil(maid: widget.maid),
-                            ),
-                          );
+                          _navigateToSecondPage();
                         },
                         child: const Text(
                           "Voir le profil",

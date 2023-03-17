@@ -1,8 +1,10 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:maidit/UserView/MaidPages/ContactMaid.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../Controller/UserFirebaseService.dart';
 import '../../model/MaidModel.dart';
 import '../../widgets/RatingStars.dart';
 
@@ -18,6 +20,27 @@ class _MaidProfilState extends State<MaidProfil> {
   int _selectedIndex = 0;
   final DateTime _focusedDay = DateTime.now();
   List<DateTime> events = [];
+  bool _isFavorite = false;
+
+  Future<void> _checkIfFavorite() async {
+    UserFirebaseService usr = UserFirebaseService();
+    bool isFavorite = await usr.isMaidFavorite(widget.maid.id);
+    setState(() {
+      _isFavorite = isFavorite;
+    });
+  }
+
+  Future<void> addToFavorites() async {
+    UserFirebaseService usr = UserFirebaseService();
+    if (_isFavorite) {
+      await usr.updateUserRemoveFavorite(widget.maid.id);
+    } else {
+      await usr.updateUserAddFavorite(widget.maid.id);
+    }
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
 
   Iterable<Widget> get tagsWidgets {
     return widget.maid.tags!.map((String tag) {
@@ -127,6 +150,7 @@ class _MaidProfilState extends State<MaidProfil> {
     setState(() {
       events = widget.maid.events!;
     });
+    _checkIfFavorite();
   }
 
   @override
@@ -135,8 +159,27 @@ class _MaidProfilState extends State<MaidProfil> {
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.maid.nom} ${widget.maid.prenom}"),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios, // replace with your desired icon
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark))
+          IconButton(
+            icon: _isFavorite
+                ? const Icon(Icons.bookmark)
+                : const Icon(Icons.bookmark_border),
+            onPressed: () {
+              setState(() {
+                _isFavorite != _isFavorite;
+              });
+              addToFavorites();
+            },
+          ),
         ],
       ),
       body: ListView(
@@ -160,7 +203,7 @@ class _MaidProfilState extends State<MaidProfil> {
                     SizedBox(
                       width: width / 2,
                       child: Text(
-                        "${widget.maid.nom} ${widget.maid.prenom}",
+                        "${widget.maid.nom.replaceFirst(widget.maid.nom.characters.first, widget.maid.nom.characters.first.toUpperCase())} ${widget.maid.prenom.replaceFirst(widget.maid.prenom.characters.first, widget.maid.prenom.characters.first.toUpperCase())}",
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -205,7 +248,17 @@ class _MaidProfilState extends State<MaidProfil> {
               SizedBox(
                   width: 160,
                   child: ElevatedButton(
-                      onPressed: () {}, child: const Text("Contacter"))),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ContactMaid(
+                              maid: widget.maid,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text("Contacter"))),
               const Expanded(child: SizedBox()),
             ],
           ),

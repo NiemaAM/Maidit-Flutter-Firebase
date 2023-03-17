@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:maidit/widgets/Bloc/FavoriteBloc.dart';
-
-import '../model/MaidFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 
 class Favorites extends StatefulWidget {
@@ -46,7 +45,7 @@ class _FavoritesState extends State<Favorites> {
       MaidFirebaseService md = MaidFirebaseService();
       List<Maid> _savedmaids = await md.getMaidsByIds(toString);
       setState(() {
-        savedmaids = _savedmaids;
+        savedmaids = _savedmaids.reversed.toList();
         _searchResults = _savedmaids;
         if (_savedmaids.isEmpty) {
           _dataState = "no data found";

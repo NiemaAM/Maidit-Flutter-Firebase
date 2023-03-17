@@ -92,14 +92,17 @@ class MaidFirebaseService {
 
   Future<List<Maid>> getMaidsByIds(List<String> ids) async {
     List<Maid> maids = [];
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
-        .collection('maids')
-        .where(FieldPath.documentId, whereIn: ids)
-        .get();
-    for (var doc in snapshot.docs) {
-      Maid maid = Maid.fromMap(doc.data());
-      maids.add(maid);
-    }
+    if (ids.isNotEmpty) {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+          .collection('maids')
+          .where(FieldPath.documentId, whereIn: ids)
+          .get();
+      for (var doc in snapshot.docs) {
+        Maid maid = Maid.fromMap(doc.data());
+        maids.add(maid);
+      }
+    } else {}
+
     return maids;
   }
 

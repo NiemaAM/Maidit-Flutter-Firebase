@@ -1,6 +1,6 @@
 // ignore_for_file: file_names, no_leading_underscores_for_local_identifiers
 import 'package:flutter/material.dart';
-import 'package:maidit/model/MaidFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 import '../widgets/Bloc/SuggestionBloc.dart';
 

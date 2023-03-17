@@ -3,11 +3,10 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:maidit/model/MaidFirebaseService.dart';
-import 'package:maidit/model/UserFirebaseService.dart';
+import '../../Controller/UserFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import 'package:maidit/model/UserModel.dart';
 import '../../model/MaidModel.dart';
-import '../../model/UserHistory.dart';
 import 'SignInCreateProfil.dart';
 
 class SignInInformations extends StatefulWidget {
@@ -50,18 +49,7 @@ class _SignInInformationsState extends State<SignInInformations> {
         events: {},
         savedMaids: [],
         messages: {},
-        history: [
-          UserHistory(
-              maidId: '6G2BAPKg4AdmNA4uOIlCnUBZpGJ3',
-              service: 'Cuisine',
-              serviceState: 0,
-              serviceDate: DateTime.now()),
-          UserHistory(
-              maidId: 'VBTw4YaWuSTZgNJDI7sEj76ADWI3',
-              service: 'Cuisine',
-              serviceState: 3,
-              serviceDate: DateTime.now())
-        ],
+        history: [],
       );
       UserFirebaseService usr = UserFirebaseService();
       usr.createUser(createduser, email, password);
@@ -195,7 +183,7 @@ class _SignInInformationsState extends State<SignInInformations> {
           child: TextField(
             controller: _NomController,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z ]")),
               LengthLimitingTextInputFormatter(25),
             ],
             decoration: const InputDecoration(
@@ -215,7 +203,7 @@ class _SignInInformationsState extends State<SignInInformations> {
           child: TextField(
             controller: _PrenomController,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z ]")),
               LengthLimitingTextInputFormatter(25),
             ],
             decoration: const InputDecoration(
@@ -257,8 +245,8 @@ class _SignInInformationsState extends State<SignInInformations> {
           child: TextField(
             controller: _VilleController,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
-              LengthLimitingTextInputFormatter(25),
+              FilteringTextInputFormatter.allow(RegExp("[a-zA-Zéèà ]")),
+              LengthLimitingTextInputFormatter(50),
             ],
             decoration: const InputDecoration(
               labelText: 'Ville*',

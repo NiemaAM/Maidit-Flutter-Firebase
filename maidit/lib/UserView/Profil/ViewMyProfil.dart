@@ -1,8 +1,11 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../Controller/MaidFirebaseService.dart';
+import '../../model/MaidModel.dart';
+import '../../model/UserHistory.dart';
 import '../../model/UserModel.dart';
 
 class ViewMyProfil extends StatefulWidget {
@@ -46,14 +49,51 @@ class _ViewMyProfilState extends State<ViewMyProfil> {
     });
   }
 
-  List<String> _getStringsForDay(DateTime day) {
-    List<String> selectedDayEvents = widget.user.events![day] ?? [];
-    return selectedDayEvents;
+  List<Maid> historyMaids = [];
+  getMaid() async {
+    List<UserHistory> historyList = [];
+    MaidFirebaseService md = MaidFirebaseService();
+    List<Maid> _historyMaids =
+        await md.getMaidsByIds(historyList.map((h) => h.maidId!).toList());
+    setState(() {
+      historyMaids = _historyMaids;
+    });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  List<String> _getStringsForDay(DateTime day) {
+    List<String> selectedDayEvents = [];
+    List<UserHistory> historyList = [];
+    historyList = widget.user.history!;
+    for (var h in historyList) {
+      if (DateTime.utc(
+              h.serviceDate!.year, h.serviceDate!.month, h.serviceDate!.day) ==
+          DateTime.utc(day.year, day.month, day.day)) {
+        switch (h.serviceState) {
+          case -1:
+            selectedDayEvents
+                .add("Service \"${h.service!}\" : Demande rejetée");
+            break;
+          case 0:
+            selectedDayEvents
+                .add("Service \"${h.service!}\" : Demande envoyée");
+            break;
+          case 1:
+            selectedDayEvents
+                .add("Service \"${h.service!}\" : Demande acceptée");
+            break;
+          case 2:
+            selectedDayEvents
+                .add("Service \"${h.service!}\" : Service en cours");
+            break;
+          case 3:
+            selectedDayEvents
+                .add("Service \"${h.service!}\" : Service terminé");
+            break;
+          default:
+        }
+      }
+    }
+    return selectedDayEvents;
   }
 
   @override
@@ -85,7 +125,7 @@ class _ViewMyProfilState extends State<ViewMyProfil> {
                         SizedBox(
                           width: 150,
                           child: Text(
-                            "${widget.user.nom} ${widget.user.prenom}",
+                            "${widget.user.nom.replaceFirst(widget.user.nom.characters.first, widget.user.nom.characters.first.toUpperCase())} ${widget.user.prenom.replaceFirst(widget.user.prenom.characters.first, widget.user.prenom.characters.first.toUpperCase())}",
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(

@@ -3,12 +3,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:maidit/Pages/Login%20and%20SignIn/FirstStep.dart';
-import 'package:maidit/Pages/home.dart';
+import 'package:maidit/UserView/Login%20and%20SignIn/FirstStep.dart';
+import 'package:maidit/UserView/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
-import '../../model/Authentication.dart';
-import '../../model/UserFirebaseService.dart';
+import '../../Controller/Authentication.dart';
 import '../../model/UserModel.dart';
 import 'LogIn.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -57,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  User? currentUser = User(
+  User currentUser = User(
     id: '',
     nom: '',
     prenom: '',
@@ -78,15 +77,11 @@ class _SplashScreenState extends State<SplashScreen> {
     Authentication auth = Authentication();
     bool logged = await auth.isUserLogedIn();
     if (logged) {
-      UserFirebaseService usr = UserFirebaseService();
-      currentUser = await usr.getUser();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => Home(
-            user: currentUser!,
-            maids: const [],
-            savedmaids: const [],
+            user: currentUser,
           ),
         ),
       );

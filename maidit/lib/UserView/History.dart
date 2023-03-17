@@ -1,11 +1,10 @@
-// ignore_for_file: file_names, non_constant_identifier_names, no_leading_underscores_for_local_identifiers
+// ignore_for_file: file_names, non_constant_identifier_names, no_leading_underscores_for_local_identifiers, unused_field
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:maidit/widgets/Bloc/HistoryBloc.dart';
-
-import '../model/MaidFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 import '../model/UserHistory.dart';
 
@@ -49,21 +48,25 @@ class _HistoryState extends State<History> {
     List<Maid> _historyMaids =
         await md.getMaidsByIds(historyList.map((h) => h.maidId!).toList());
 
-    setState(() {
-      historyMaids = _historyMaids;
-      _searchResults = _historyMaids;
-      userHistory.addAll(historyList);
-    });
-
-    if (userHistory.isEmpty) {
-      setState(() {
-        _dataState = "no data found";
-      });
-    } else {
-      setState(() {
-        _dataState = "data found";
-      });
+    List<Maid> resultHistory = [];
+    for (var h in historyList) {
+      for (var m in _historyMaids) {
+        if (m.id == h.maidId) {
+          resultHistory.add(m);
+        }
+      }
     }
+
+    setState(() {
+      historyMaids = resultHistory;
+      _searchResults = resultHistory;
+      userHistory.addAll(historyList.reversed.toList());
+      if (resultHistory.isEmpty) {
+        _dataState = "no data found";
+      } else {
+        _dataState = "data found";
+      }
+    });
   }
 
   @override
@@ -88,48 +91,51 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: _searchPressed
-            ? TextField(
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Rechercher un profil',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white54),
-                ),
-                style: const TextStyle(color: Colors.white),
-                onChanged: _handleSearch,
-                controller: _searchController,
-              )
-            : const Text("Rechercher"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  _searchPressed = !_searchPressed;
-                  _searchController.clear();
-                  _handleSearch('');
-                });
-              },
-              icon: const Icon(Icons.search)),
-        ],
-      ),
-      body: historyMaids.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : _searchResults.isNotEmpty
-              ? ListView.builder(
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    return HistoryBloc(
-                      maid: _searchResults[index],
-                      history: userHistory[index],
-                    );
-                  },
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: _searchPressed
+              ? TextField(
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Rechercher un profil',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.white54),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: _handleSearch,
+                  controller: _searchController,
                 )
-              : const Center(
-                  child: Text("Aucun résultat trouvé"),
-                ),
-    );
+              : const Text("Rechercher"),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    _searchPressed = !_searchPressed;
+                    _searchController.clear();
+                    _handleSearch('');
+                  });
+                },
+                icon: const Icon(Icons.search)),
+          ],
+        ),
+        body: _dataState == "is loading"
+            ? const Center(child: CircularProgressIndicator())
+            : _dataState == "data found"
+                ? _searchResults.isNotEmpty
+                    ? ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          return HistoryBloc(
+                            maid: _searchResults[index],
+                            history: userHistory[index],
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text("Aucun résultat trouvé"),
+                      )
+                : const Center(
+                    child: Text("Auccun Historique"),
+                  ));
   }
 }

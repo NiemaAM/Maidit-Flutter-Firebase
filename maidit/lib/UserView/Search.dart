@@ -1,8 +1,7 @@
-// ignore_for_file: file_names, non_constant_identifier_names
+// ignore_for_file: file_names, non_constant_identifier_names, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
-
-import '../model/MaidFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import '../model/MaidModel.dart';
 import '../widgets/Bloc/SearchBloc.dart';
 

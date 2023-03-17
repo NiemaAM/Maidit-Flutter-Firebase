@@ -2,11 +2,11 @@
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:maidit/model/UserFirebaseService.dart';
-import '../../model/Authentication.dart';
+import '../../Controller/Authentication.dart';
+import '../../Controller/UserFirebaseService.dart';
 import '../../model/UserModel.dart';
 import 'SignInChooseProfil.dart';
-import 'package:maidit/Pages/home.dart';
+import 'package:maidit/UserView/home.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -51,8 +51,6 @@ class _LogInState extends State<LogIn> {
         MaterialPageRoute(
           builder: (context) => Home(
             user: currentUser!,
-            maids: const [],
-            savedmaids: const [],
           ),
         ),
       );

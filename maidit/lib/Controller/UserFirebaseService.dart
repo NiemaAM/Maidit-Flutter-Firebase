@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../model/UserHistory.dart';
 import '../model/UserModel.dart';
 
 class UserFirebaseService {
@@ -42,6 +43,37 @@ class UserFirebaseService {
     // Update description and phone fields
     await userDoc.update({
       'id': prefs.getString('uid'),
+      'description': description,
+    });
+  }
+
+  Future<void> updateUserEdit(String nom, String prenom, String description,
+      File? photo, String? imageURL, List<String> tags) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+
+    // Upload photo to Firebase Storage
+    if (imageURL == null) {
+      if (photo!.path.length > 10) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('users/${userDoc.id}/profilPic');
+        final uploadTask = storageRef.putFile(photo);
+        final snapshot = await uploadTask.whenComplete(() => null);
+        final photoUrl = await snapshot.ref.getDownloadURL();
+
+        // Update user document with new photo URL
+        await userDoc.update({'photo': photoUrl});
+      }
+    } else {
+      await userDoc.update({
+        'photo': imageURL,
+      });
+    }
+    updateUserAddTags(tags);
+    await userDoc.update({
+      'nom': nom,
+      'prenom': prenom,
       'description': description,
     });
   }
@@ -89,6 +121,15 @@ class UserFirebaseService {
     } else {
       return false;
     }
+  }
+
+  Future<void> updateUserAddHistory(UserHistory history) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    // Update description and phone fields
+    await userDoc.update({
+      'history': FieldValue.arrayUnion([history.toMap()]),
+    });
   }
 
   // Function to get an existing user from Firebase

@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:maidit/model/UserHistory.dart';
 
-import '../../Pages/Profil/MaidProfil.dart';
+import '../../UserView/MaidPages/MaidProfil.dart';
 import '../../model/MaidModel.dart';
 
 class HistoryBloc extends StatefulWidget {
@@ -179,7 +179,7 @@ class _HistoryBlocState extends State<HistoryBloc> {
                     ),
                     serviceState(),
                     Text(
-                      "${widget.history.serviceDate!.day}/${widget.history.serviceDate!.month}/${widget.history.serviceDate!.year}",
+                      "Le ${widget.history.serviceDate!.day}/${widget.history.serviceDate!.month}/${widget.history.serviceDate!.year} à ${widget.history.serviceDate!.hour}:${widget.history.serviceDate!.minute}",
                       style: const TextStyle(
                           fontSize: 14, color: Color.fromARGB(255, 9, 43, 104)),
                     ),

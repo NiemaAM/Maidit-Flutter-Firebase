@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:maidit/Pages/Login%20and%20SignIn/SplashScreen.dart';
+import 'package:maidit/UserView/Login%20and%20SignIn/SplashScreen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() {

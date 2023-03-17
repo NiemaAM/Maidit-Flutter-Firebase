@@ -1,12 +1,12 @@
 // ignore_for_file: file_names, non_constant_identifier_names, deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:maidit/Pages/Login%20and%20SignIn/LogIn.dart';
-import 'package:maidit/Pages/home.dart';
+import 'package:maidit/UserView/Login%20and%20SignIn/LogIn.dart';
+import 'package:maidit/UserView/home.dart';
 
-import '../../model/Authentication.dart';
-import '../../model/MaidFirebaseService.dart';
-import '../../model/UserFirebaseService.dart';
+import '../../Controller/Authentication.dart';
+import '../../Controller/UserFirebaseService.dart';
+import '../../Controller/MaidFirebaseService.dart';
 import '../../model/UserModel.dart';
 
 class SignInChooseTags extends StatefulWidget {
@@ -116,8 +116,6 @@ class _SignInChooseTagsState extends State<SignInChooseTags> {
         MaterialPageRoute(
           builder: (context) => Home(
             user: currentUser!,
-            maids: const [],
-            savedmaids: const [],
           ),
         ),
       );
