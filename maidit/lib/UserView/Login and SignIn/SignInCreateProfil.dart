@@ -63,15 +63,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios, // replace with your desired icon
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        automaticallyImplyLeading: false,
         actions: [
           const Expanded(child: SizedBox()),
           Image.asset(

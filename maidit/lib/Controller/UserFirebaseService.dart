@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:maidit/model/UserMessages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/UserHistory.dart';
 import '../model/UserModel.dart';
@@ -14,14 +15,23 @@ class UserFirebaseService {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
   // Function to create a new user in Firebase
-  Future<String> createUser(User user, String email, String password) async {
-    auth.UserCredential cred = await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    //add the user to FireBase
-    await _firestore.collection('users').doc(cred.user!.uid).set(user.toMap());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('uid', cred.user!.uid);
-    return cred.user!.uid;
+  Future<String?> createUser(User user, String email, String password) async {
+    try {
+      auth.UserCredential cred = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      //add the user to FireBase
+      await _firestore
+          .collection('users')
+          .doc(cred.user!.uid)
+          .set(user.toMap());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('uid', cred.user!.uid);
+      return "Compte crée avec succés";
+    } on auth.FirebaseAuthException catch (e) {
+      // ignore: avoid_print
+      print(e);
+      return "Cette adresse email existe déja!";
+    }
   }
 
   Future<void> updateUser(String description, File photo) async {
@@ -130,6 +140,34 @@ class UserFirebaseService {
     await userDoc.update({
       'history': FieldValue.arrayUnion([history.toMap()]),
     });
+  }
+
+  Future<void> updateUserAddMessage(UserMessages message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    // Update description and phone fields
+    await userDoc.update({
+      'messages': FieldValue.arrayUnion([message.toMap()]),
+    });
+  }
+
+  Future<List<UserMessages>> getUserMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
+    final snapshot = await userDoc.get();
+    List<UserMessages> messagesList = [];
+    if (snapshot.exists && snapshot['messages'] != null) {
+      final messagesMapList =
+          List<Map<String, dynamic>>.from(snapshot['messages']);
+      messagesList = messagesMapList
+          .map((historyMap) => UserMessages(
+              dateTime: DateTime.parse(historyMap['dateTime'].toString()),
+              message: historyMap['message'].toString(),
+              userId: historyMap['userId'].toString(),
+              recipientId: historyMap['recipientId'].toString()))
+          .toList();
+    }
+    return messagesList;
   }
 
   // Function to get an existing user from Firebase

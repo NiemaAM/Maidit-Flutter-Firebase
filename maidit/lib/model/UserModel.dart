@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'UserHistory.dart';
+import 'UserMessages.dart';
 
 class User {
   String id = '';
@@ -21,8 +22,7 @@ class User {
   List<String>? savedMaids = [];
   List<UserHistory>? history = [];
   //this field will be sorted by datetime and by id in the chat
-  Map<Map<String /*maid id*/, String /*user id*/ >,
-      Map<DateTime /*date and time*/, String /*message*/ >>? messages = {};
+  List<UserMessages>? messages = [];
 
   User({
     required this.id,
@@ -60,16 +60,8 @@ class User {
           events?.map((key, value) => MapEntry(key.toIso8601String(), value)) ??
               {},
       'savedMaids': savedMaids ?? [],
-      'history': history?.map((h) => h.toMap()).toList() ?? {},
-      'messages': messages?.map((maidUserIdMap, dateTimeMessageMap) {
-            return MapEntry(
-              maidUserIdMap.map(
-                  (key, value) => MapEntry(key.toString(), value.toString())),
-              dateTimeMessageMap.map((key, value) =>
-                  MapEntry(key.toIso8601String(), value.toString())),
-            );
-          }) ??
-          {}
+      'history': history?.map((h) => h.toMap()).toList() ?? [],
+      'messages': messages?.map((m) => m.toMap()).toList() ?? []
     };
   }
 
@@ -96,7 +88,7 @@ class User {
       history: (map['history'] as List<dynamic>?)
           ?.map((h) => UserHistory.fromMap(h as Map<String, dynamic>))
           .toList(),
-      messages: {}, //TODO: change this to add the messages
+      messages: [],
     );
   }
 

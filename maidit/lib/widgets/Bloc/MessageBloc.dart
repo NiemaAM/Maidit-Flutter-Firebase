@@ -1,10 +1,15 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:maidit/model/UserMessages.dart';
+
+import '../../UserView/chat/ChatPage.dart';
+import '../../model/MaidModel.dart';
 
 class MessageBloc extends StatefulWidget {
-  final String id;
-  const MessageBloc({super.key, required this.id});
+  final Maid maid;
+  final UserMessages message;
+  const MessageBloc({super.key, required this.maid, required this.message});
 
   @override
   State<MessageBloc> createState() => _MessageBlocState();
@@ -15,7 +20,10 @@ class _MessageBlocState extends State<MessageBloc> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        //TODO: handel tap
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ChatPage(maid: widget.maid)),
+        );
       },
       child: Container(
         height: 80,
@@ -63,39 +71,39 @@ class _MessageBlocState extends State<MessageBloc> {
             Positioned.fill(
               child: Row(
                 children: [
-                  const Padding(
-                    padding:
-                        EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 5, right: 5, top: 5, bottom: 5),
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(
-                          "https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=1060&t=st=1678653484~exp=1678654084~hmac=cc0aaa0057aa2056f47cc2a4520f4b3d85dfe8199dd8c5d6853cc32dff2c1f00"),
+                      backgroundImage: NetworkImage(widget.maid.photo!),
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Expanded(child: SizedBox()),
+                    children: [
+                      const Expanded(child: SizedBox()),
                       SizedBox(
                         width: 150,
                         child: Text(
-                          "Salma Boutine",
+                          "${widget.maid.nom.replaceFirst(widget.maid.nom.characters.first, widget.maid.nom.characters.first.toUpperCase())} ${widget.maid.prenom.replaceFirst(widget.maid.prenom.characters.first, widget.maid.prenom.characters.first.toUpperCase())}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(
                         width: 150,
                         child: Text(
-                          "Bonjour, je suis salma! je peux vous aider avec vos taches ménageres.",
+                          widget.message.message,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 14, color: Colors.black45),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.black45),
                         ),
                       ),
-                      Expanded(child: SizedBox()),
+                      const Expanded(child: SizedBox()),
                     ],
                   ),
                 ],

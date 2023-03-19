@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maidit/model/UserHistory.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/UserFirebaseService.dart';
 import '../../model/MaidModel.dart';
+import '../../model/UserMessages.dart';
 
 class ContactMaid extends StatefulWidget {
   final Maid maid;
@@ -33,6 +35,16 @@ class _ContactMaidState extends State<ContactMaid> {
         selectedDate = picked;
       });
     }
+  }
+
+  _saveToMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    UserFirebaseService usr = UserFirebaseService();
+    usr.updateUserAddMessage(UserMessages(
+        message: _MessageController.text,
+        dateTime: DateTime.now(),
+        userId: prefs.getString('uid')!,
+        recipientId: widget.maid.id));
   }
 
   _saveToHistory() async {
@@ -193,6 +205,7 @@ class _ContactMaidState extends State<ContactMaid> {
                             Text('Veuillez remplir les champs manquants')));
                   } else {
                     _saveToHistory();
+                    _saveToMessages();
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         backgroundColor: Color.fromARGB(255, 239, 31, 118),
                         content: Text('Demande envoyée')));

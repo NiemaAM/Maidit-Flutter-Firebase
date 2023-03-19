@@ -13,14 +13,23 @@ class MaidFirebaseService {
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
 
   // Function to create a new user in Firebase
-  Future<String> createMaid(Maid maid, String email, String password) async {
-    auth.UserCredential cred = await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    //add the user to FireBase
-    await _firestore.collection('maids').doc(cred.user!.uid).set(maid.toMap());
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('uid', cred.user!.uid);
-    return cred.user!.uid;
+  Future<String?> createMaid(Maid maid, String email, String password) async {
+    try {
+      auth.UserCredential cred = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      //add the user to FireBase
+      await _firestore
+          .collection('maids')
+          .doc(cred.user!.uid)
+          .set(maid.toMap());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('uid', cred.user!.uid);
+      return "Compte crée avec succés";
+    } on auth.FirebaseAuthException catch (e) {
+      // ignore: avoid_print
+      print(e);
+      return "Cette adresse email existe déja!";
+    }
   }
 
   Future<void> updateMaid(String description, File photo) async {

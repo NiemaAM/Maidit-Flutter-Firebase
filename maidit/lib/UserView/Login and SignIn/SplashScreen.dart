@@ -2,12 +2,12 @@
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart' as fauth;
 import 'package:flutter/material.dart';
 import 'package:maidit/UserView/Login%20and%20SignIn/FirstStep.dart';
 import 'package:maidit/UserView/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../firebase_options.dart';
-import '../../Controller/Authentication.dart';
 import '../../model/UserModel.dart';
 import 'LogIn.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -72,11 +72,13 @@ class _SplashScreenState extends State<SplashScreen> {
     events: {},
     savedMaids: [],
   );
+
   isUserLogged() async {
     await Firebase.initializeApp();
-    Authentication auth = Authentication();
-    bool logged = await auth.isUserLogedIn();
-    if (logged) {
+    final fauth.FirebaseAuth _auth = fauth.FirebaseAuth.instance;
+    final fauth.User? user = _auth.currentUser;
+
+    if (user != null) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

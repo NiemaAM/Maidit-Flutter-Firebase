@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, non_constant_identifier_names
+// ignore_for_file: file_names, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import '../../Controller/UserFirebaseService.dart';
 import '../../Controller/MaidFirebaseService.dart';
 import 'package:maidit/model/UserModel.dart';
 import '../../model/MaidModel.dart';
+import '../../model/UserMessages.dart';
 import 'SignInCreateProfil.dart';
 
 class SignInInformations extends StatefulWidget {
@@ -48,19 +49,31 @@ class _SignInInformationsState extends State<SignInInformations> {
         tags: [],
         events: {},
         savedMaids: [],
-        messages: {},
+        messages: [
+          UserMessages(
+              dateTime: DateTime.now(),
+              message: 'hello',
+              recipientId: '6G2BAPKg4AdmNA4uOIlCnUBZpGJ3',
+              userId: '')
+        ],
         history: [],
       );
+
       UserFirebaseService usr = UserFirebaseService();
-      usr.createUser(createduser, email, password);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SignInCreateProfil(
-            profilType: widget.profilType,
+      String? message = await usr.createUser(createduser, email, password);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: const Color.fromARGB(255, 239, 31, 118),
+          content: Text(message!)));
+      if (message == "Compte crée avec succés") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SignInCreateProfil(
+              profilType: widget.profilType,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } else {
       Maid createdMaid = Maid(
           id: '',
@@ -83,15 +96,21 @@ class _SignInInformationsState extends State<SignInInformations> {
           certified: false,
           coments: {});
       MaidFirebaseService md = MaidFirebaseService();
-      md.createMaid(createdMaid, email, password);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SignInCreateProfil(
-            profilType: widget.profilType,
+      String? message = await md.createMaid(createdMaid, email, password);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: const Color.fromARGB(255, 239, 31, 118),
+          content: Text(message!)));
+      if (message == "Compte crée avec succés") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SignInCreateProfil(
+              profilType: widget.profilType,
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 
