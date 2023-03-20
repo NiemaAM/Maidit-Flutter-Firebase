@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, non_constant_identifier_names, no_leading_underscores_for_local_identifiers
+// ignore_for_file: file_names, non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,85 +17,21 @@ class Messages extends StatefulWidget {
 }
 
 class _MessagesState extends State<Messages> {
-  bool _searchPressed = false;
-  final TextEditingController _searchController = TextEditingController();
   List<Maid> historyMaids = [];
   final FirebaseAuth _auth = FirebaseAuth.instance;
   List<UserMessages> UserMessage = [];
   DocumentSnapshot? snapshot;
-  String _dataState = "is loading";
-
-  Future<void> getHistoryMaids() async {
-    User? currentUser = _auth.currentUser;
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser!.uid)
-        .get();
-    List<UserMessages> messagesList = [];
-    if (snapshot.exists && snapshot['messages'] != null) {
-      final messagesMapList =
-          List<Map<String, dynamic>>.from(snapshot['messages']);
-      messagesList = messagesMapList
-          .map((historyMap) => UserMessages(
-              dateTime: DateTime.parse(historyMap['dateTime'].toString()),
-              message: historyMap['message'].toString(),
-              userId: historyMap['userId'].toString(),
-              recipientId: historyMap['recipientId'].toString()))
-          .toList();
-    }
-
-    MaidFirebaseService md = MaidFirebaseService();
-    List<Maid> _messagesMaids =
-        await md.getMaidsByIds(messagesList.map((h) => h.recipientId).toList());
-
-    setState(() {
-      historyMaids = _messagesMaids;
-      _searchResults = _messagesMaids;
-      UserMessage.addAll(messagesList.reversed.toList());
-      if (_messagesMaids.isEmpty) {
-        _dataState = "no data found";
-      } else {
-        _dataState = "data found";
-      }
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    getHistoryMaids();
-  }
-
-  List<Maid> _searchResults = [];
-  void _handleSearch(String query) {
-    setState(() {
-      _searchResults = historyMaids
-          .where((maid) => maid.tags!.any((tag) =>
-              tag.toLowerCase().contains(query.toLowerCase()) ||
-              maid.nom.toLowerCase().contains(query.toLowerCase()) ||
-              maid.prenom.toLowerCase().contains(query.toLowerCase()) ||
-              maid.description.toLowerCase().contains(query.toLowerCase())))
-          .toList();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: _searchPressed
-              ? TextField(
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Rechercher une personne',
-                    border: InputBorder.none,
-                    hintStyle: TextStyle(color: Colors.white54),
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                  onChanged: _handleSearch,
-                  controller: _searchController,
-                )
-              : const Text("Conversations"),
+          title: const Text("Conversations"),
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios, // replace with your desired icon
@@ -105,36 +41,86 @@ class _MessagesState extends State<Messages> {
               Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    _searchPressed = !_searchPressed;
-                    _searchController.clear();
-                    _handleSearch('');
-                  });
-                },
-                icon: const Icon(Icons.search)),
-          ],
         ),
-        body: _dataState == "is loading"
-            ? const Center(child: CircularProgressIndicator())
-            : _dataState == "data found"
-                ? _searchResults.isNotEmpty
-                    ? ListView.builder(
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          return MessageBloc(
-                            maid: _searchResults[index],
-                            message: UserMessage[index],
-                          );
-                        },
-                      )
-                    : const Center(
-                        child: Text("Aucun résultat trouvé"),
-                      )
-                : const Center(
-                    child: Text("Auccun Message"),
-                  ));
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(_auth.currentUser!.uid)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (!snapshot.hasData ||
+                snapshot.data!['messages'] == null ||
+                snapshot.data!['messages'].isEmpty) {
+              return const Center(child: Text("Auccun Message"));
+            } else {
+              List<Map<String, dynamic>> messagesMapList =
+                  List<Map<String, dynamic>>.from(snapshot.data!['messages']);
+              List<UserMessages> messagesList = messagesMapList
+                  .map((MessageMap) => UserMessages(
+                      dateTime:
+                          DateTime.parse(MessageMap['dateTime'].toString()),
+                      message: MessageMap['message'].toString(),
+                      userId: MessageMap['userId'].toString(),
+                      recipientId: MessageMap['recipientId'].toString()))
+                  .toList();
+              return FutureBuilder<List<Maid>>(
+                  future: MaidFirebaseService().getMaidsByIds(
+                      messagesList.map((h) => h.recipientId).toSet().toList()),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Maid>> maidSnapshot) {
+                    if (maidSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (!maidSnapshot.hasData ||
+                        maidSnapshot.data!.isEmpty) {
+                      return const Center(child: Text("Aucun Message"));
+                    } else {
+                      List<Maid> historyMaids =
+                          maidSnapshot.data!.toSet().toList();
+                      List<UserMessages> lastMessages = [];
+                      for (var maid in historyMaids) {
+                        var lastMessage = messagesList.lastWhere(
+                            (message) =>
+                                (message.recipientId == maid.id &&
+                                    message.userId == _auth.currentUser!.uid) ||
+                                (message.userId == maid.id &&
+                                    message.recipientId ==
+                                        _auth.currentUser!.uid),
+                            orElse: () => UserMessages(
+                                dateTime: DateTime.now(),
+                                message: '',
+                                recipientId: '',
+                                userId: ''));
+                        lastMessages.add(lastMessage);
+                      }
+
+                      return Column(
+                        children: [
+                          historyMaids.isNotEmpty
+                              ? Expanded(
+                                  child: ListView.builder(
+                                    itemCount: historyMaids.length,
+                                    itemBuilder: (context, index) {
+                                      return MessageBloc(
+                                        maid: historyMaids[index],
+                                        message: lastMessages[index],
+                                      );
+                                    },
+                                  ),
+                                )
+                              : const Expanded(
+                                  child: Center(
+                                      child: Text("Aucun résultat trouvé")),
+                                )
+                        ],
+                      );
+                    }
+                  });
+            }
+          },
+        ));
   }
 }

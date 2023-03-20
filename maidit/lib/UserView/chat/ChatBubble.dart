@@ -61,7 +61,7 @@ class ChatBubble extends StatelessWidget {
             alignment:
                 isSentByMe ? Alignment.bottomRight : Alignment.bottomLeft,
             child: Text(
-              "Le ${date.day}/${date.month}/${date.year} à ${date.hour}:${date.minute}",
+              "${date.hour}:${date.minute}",
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ))
       ],

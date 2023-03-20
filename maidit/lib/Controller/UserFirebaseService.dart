@@ -34,12 +34,12 @@ class UserFirebaseService {
     }
   }
 
-  Future<void> updateUser(String description, File photo) async {
+  Future<void> updateUser(String description, File? photo) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final userDoc = _firestore.collection('users').doc(prefs.getString('uid'));
 
     // Upload photo to Firebase Storage
-    if (photo.path.length > 10) {
+    if (photo != null) {
       final storageRef =
           FirebaseStorage.instance.ref().child('users/${userDoc.id}/profilPic');
       final uploadTask = storageRef.putFile(photo);
@@ -48,6 +48,10 @@ class UserFirebaseService {
 
       // Update user document with new photo URL
       await userDoc.update({'photo': photoUrl});
+    } else {
+      await userDoc.update({
+        'photo': "https://cdn-icons-png.flaticon.com/512/3177/3177440.png",
+      });
     }
 
     // Update description and phone fields

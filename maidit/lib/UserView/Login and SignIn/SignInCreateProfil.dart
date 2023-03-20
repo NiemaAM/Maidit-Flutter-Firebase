@@ -31,7 +31,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
     });
   }
 
-  CreateAccount(String description, File photo) async {
+  CreateAccount(String description, File? photo) async {
     if (widget.profilType == 0) {
       UserFirebaseService usr = UserFirebaseService();
       usr.updateUser(description, photo);
@@ -45,7 +45,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
       );
     } else {
       MaidFirebaseService md = MaidFirebaseService();
-      md.updateMaid(description, photo);
+      md.updateMaid(description, photo!);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -213,7 +213,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
                 onPressed: () {
-                  CreateAccount(_DescriptionController.text, _image!);
+                  CreateAccount(_DescriptionController.text, _image ?? null);
                 },
                 child: Row(
                   children: const [

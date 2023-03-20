@@ -49,13 +49,7 @@ class _SignInInformationsState extends State<SignInInformations> {
         tags: [],
         events: {},
         savedMaids: [],
-        messages: [
-          UserMessages(
-              dateTime: DateTime.now(),
-              message: 'hello',
-              recipientId: '6G2BAPKg4AdmNA4uOIlCnUBZpGJ3',
-              userId: '')
-        ],
+        messages: [],
         history: [],
       );
 

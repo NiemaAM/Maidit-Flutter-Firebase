@@ -134,18 +134,56 @@ class _ChatPageState extends State<ChatPage> {
               return const Center(child: CircularProgressIndicator());
             }
             getUserData();
+            // Create a map that groups messages by date
+            Map<DateTime, List<UserMessages>> messagesByDate = {};
+            for (var message in messages) {
+              DateTime date = message.dateTime;
+              date = DateTime(date.year, date.month, date.day); // ignore time
+              if (!messagesByDate.containsKey(date)) {
+                messagesByDate[date] = [];
+              }
+              messagesByDate[date]!.add(message);
+            }
+            List<DateTime> sortedDates = messagesByDate.keys.toList()
+              ..sort((a, b) => b.compareTo(a));
+            sortedDates = sortedDates.reversed.toList();
             return Padding(
               padding: const EdgeInsets.only(
                   left: 15, right: 15, bottom: 80, top: 10),
               child: ListView.builder(
                 controller: _controller,
-                itemCount: messages.length,
+                itemCount: sortedDates.length,
                 itemBuilder: (context, index) {
-                  final message = messages[index];
-                  return ChatBubble(
-                    message: message.message,
-                    isSentByMe: _isUserSender(message),
-                    date: message.dateTime,
+                  final date = sortedDates[index];
+                  final messagesForDate = messagesByDate[date]!;
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                            style: const TextStyle(fontSize: 12),
+                            "${date.day}/${date.month}/${date.year}" ==
+                                    "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}"
+                                ? "Aujourd'hui"
+                                : "${date.day}/${date.month}/${date.year}" ==
+                                        "${DateTime.now().subtract(const Duration(days: 1)).day}/${DateTime.now().subtract(const Duration(days: 1)).month}/${DateTime.now().subtract(const Duration(days: 1)).year}"
+                                    ? "Hier"
+                                    : "Le ${date.day}/${date.month}/${date.year}"),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: messagesForDate.length,
+                        itemBuilder: (context, index) {
+                          final message = messagesForDate[index];
+                          return ChatBubble(
+                            message: message.message,
+                            isSentByMe: _isUserSender(message),
+                            date: message.dateTime,
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               ),

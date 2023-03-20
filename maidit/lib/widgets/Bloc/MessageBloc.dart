@@ -96,7 +96,9 @@ class _MessageBlocState extends State<MessageBloc> {
                       SizedBox(
                         width: 150,
                         child: Text(
-                          widget.message.message,
+                          widget.message.recipientId == widget.maid.id
+                              ? "Vous: ${widget.message.message}"
+                              : widget.message.message,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
