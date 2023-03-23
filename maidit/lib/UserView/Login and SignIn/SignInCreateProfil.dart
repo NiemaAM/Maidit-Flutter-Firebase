@@ -213,7 +213,7 @@ class _SignInCreateProfilState extends State<SignInCreateProfil> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 31, 118)),
                 onPressed: () {
-                  CreateAccount(_DescriptionController.text, _image ?? null);
+                  CreateAccount(_DescriptionController.text, _image);
                 },
                 child: Row(
                   children: const [

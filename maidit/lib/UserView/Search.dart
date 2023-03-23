@@ -62,9 +62,12 @@ class _SearchState extends State<Search> {
   final List<String> serviceList = [
     'Cuisine',
     'Ménage',
-    'Babysitting',
     'Nettoyage',
-    'Rangement'
+    'Garde d\'enfants',
+    'Rangement',
+    'Patisserie',
+    'Lessive',
+    'Vaisselle',
   ];
 
   Future<void> _selectDate(BuildContext context) async {

@@ -23,6 +23,8 @@ class Maid {
   Map<String /*user id*/,
           Map<DateTime /*date*/, Map<double /*rating*/, String /*comment*/ >>>?
       coments = {};
+  double? latitude = 0.01;
+  double? longitude = 0.01;
 
   Maid({
     required this.id,
@@ -44,6 +46,8 @@ class Maid {
     required this.nbrRating,
     required this.certified,
     this.coments,
+    this.latitude,
+    this.longitude,
   });
 
   Map<String, dynamic> toMap() {
@@ -72,6 +76,8 @@ class Maid {
               k2.toIso8601String(), v2.map((k3, v3) => MapEntry(k3, v3)));
         }));
       }),
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 
@@ -104,6 +110,8 @@ class Maid {
           }));
         }));
       }),
+      latitude: map['latitude']?.toDouble(),
+      longitude: map['longitude']?.toDouble(),
     );
   }
 
