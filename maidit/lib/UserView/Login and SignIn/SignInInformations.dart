@@ -7,7 +7,6 @@ import '../../Controller/UserFirebaseService.dart';
 import '../../Controller/MaidFirebaseService.dart';
 import 'package:maidit/model/UserModel.dart';
 import '../../model/MaidModel.dart';
-import '../../model/UserMessages.dart';
 import 'SignInCreateProfil.dart';
 
 class SignInInformations extends StatefulWidget {

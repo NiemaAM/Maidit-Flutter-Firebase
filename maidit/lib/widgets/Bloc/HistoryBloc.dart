@@ -1,9 +1,12 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:maidit/UserView/Map/TrackMaid.dart';
+import 'package:maidit/UserView/Payement/ChooseMethode.dart';
 import 'package:maidit/model/UserHistory.dart';
 
 import '../../UserView/MaidPages/MaidProfil.dart';
+import '../../UserView/chat/ChatPage.dart';
 import '../../model/MaidModel.dart';
 
 class HistoryBloc extends StatefulWidget {
@@ -185,17 +188,73 @@ class _HistoryBlocState extends State<HistoryBloc> {
                     ),
                     TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  MaidProfil(maid: widget.maid),
-                            ),
-                          );
+                          switch (_serviceState) {
+                            case -1:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      MaidProfil(maid: widget.maid),
+                                ),
+                              );
+                              break;
+                            case 0:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChatPage(maid: widget.maid),
+                                ),
+                              );
+                              break;
+                            case 1:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChatPage(maid: widget.maid),
+                                ),
+                              );
+                              break;
+                            case 2:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TrackMaid(maid: widget.maid),
+                                ),
+                              );
+                              break;
+                            case 3:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChooseMethode(maid: widget.maid),
+                                ),
+                              );
+                              break;
+                            default:
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      MaidProfil(maid: widget.maid),
+                                ),
+                              );
+                          }
                         },
-                        child: const Text(
-                          "Voir le profil",
-                          style: TextStyle(
+                        child: Text(
+                          _serviceState == -1
+                              ? "Voir le profil"
+                              : _serviceState == 0 || _serviceState == 1
+                                  ? "Voir ma demande"
+                                  : _serviceState == 2
+                                      ? "Suivre le service"
+                                      : _serviceState == 3
+                                          ? "Proceder au payement"
+                                          : "Voir le profil",
+                          style: const TextStyle(
                               decoration: TextDecoration.underline,
                               fontSize: 12),
                         )),
